@@ -48,7 +48,7 @@ def create_order_endpoint():
 
     # Default line item for the demo
     line_items = [{
-        "name": "Demo Product",
+        "name": "Snowboard Jacket Soft Pink",
         "quantity": 1,
         "unit_amount": amount
     }]

@@ -89,22 +89,29 @@ async function initWidget(order) {
     const paymentOptions = {
         currency: order.currency,
         totalAmount: order.amount,  // already in minor units from backend
-
-        // Line items (bonus requirement)
+        // Line items (matches user's jacket product)
         lineItems: [
             {
-                name: 'Demo Product',
-                quantity: 1,
-                unitAmount: {
-                    currency: order.currency,
-                    value: order.amount,
+                name: 'Snowboard Jacket Soft Pink',
+                totalAmount: order.amount.toString(),
+                unitPriceAmount: order.amount.toString(),
+                quantity: {
+                    value: 1,
+                    unit: 'PIECES',
                 },
+                type: 'PHYSICAL',
             },
         ],
 
         // createOrder is called by the widget when the user clicks Pay
         createOrder: async () => {
             return { publicId: order.public_token };
+        },
+
+        // Style the button for the light theme (guidelines: black on light background)
+        buttonStyle: {
+            variant: 'dark',
+            radius: 'small',
         },
     };
 
