@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — Revolut Pay Demo{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <!-- Summary cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon stat-icon--total">
+                <div class="stat-icon stat-icon--total">
+                    <span class="material-symbols-outlined stat-symbol">receipt_long</span>
+                </div>
+            </div>
+            <div>
+                <div class="stat-label">Total Orders</div>
+                <div class="stat-value" id="statTotal">—</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon stat-icon--success">
+                <div class="stat-icon stat-icon--success">
+                    <span class="material-symbols-outlined stat-symbol">check_circle</span>
+                </div>
+            </div>
+            <div>
+                <div class="stat-label">Successful</div>
+                <div class="stat-value stat-value--success" id="statSuccess">—</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon stat-icon--fail">
+                <div class="stat-icon stat-icon--fail">
+                    <span class="material-symbols-outlined stat-symbol">cancel</span>
+                </div>
+            </div>
+            <div>
+                <div class="stat-label">Failed</div>
+                <div class="stat-value stat-value--fail" id="statFailed">—</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent orders table -->
+    <div class="table-card">
+        <div class="table-card-header">
+            <h2 class="section-heading">Recent Orders</h2>
+            <div class="polling-indicator" id="pollingIndicator">
+                <span class="pulse-dot"></span> Pooling Real Time Orders
+            </div>
+        </div>
+
+        <div id="emptyState" class="empty-state" style="display:none">
+            <span class="material-symbols-outlined empty-icon">receipt</span>
+            <p>No orders yet. <a href="/pay">Create your first order →</a></p>
+        </div>
+
+        <div class="table-wrapper" id="tableWrapper">
+            <table class="orders-table" id="ordersTable">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Amount</th>
+                        <th>Currency</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="ordersTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Revolut Pay Demo{% endblock %}</title>
+  <meta name="description"
+    content="Revolut Pay sandbox integration demo — secure, modern fintech checkout experience." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+
+<body>
+  <!-- Mobile sidebar overlay -->
+  <div class="overlay" id="overlay"></div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">R</div>
+      <span class="logo-text">RevPay Demo</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="/dashboard" class="nav-item {% if request.path == '/dashboard' %}active{% endif %}">
+        <span class="material-symbols-outlined nav-icon">dashboard</span>
+        <span class="nav-text">Dashboard</span>
+      </a>
+      <a href="/pay" class="nav-item {% if request.path == '/pay' or request.path == '/' %}active{% endif %}">
+        <span class="material-symbols-outlined nav-icon">payments</span>
+        <span class="nav-text">Revolut Pay</span>
+      </a>
+      <a href="/orders" class="nav-item {% if request.path == '/orders' %}active{% endif %}">
+        <span class="material-symbols-outlined nav-icon">receipt_long</span>
+        <span class="nav-text">Orders</span>
+      </a>
+
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-badge">Sandbox Mode</div>
+    </div>
+  </aside>
+
+  <!-- Main layout -->
+  <div class="main-wrapper">
+    <!-- Header -->
+    <header class="topbar">
+      <button class="hamburger" id="hamburger" aria-label="Open menu">
+      </button>
+      <div class="topbar-title">{% block page_title %}{% endblock %}</div>
+      <button class="user-btn" id="userBtn" aria-label="User menu">
+        <span class="material-symbols-outlined user-icon">account_circle</span>
+      </button>
+    </header>
+
+    <!-- Slide-out user panel -->
+    <div class="user-panel" id="userPanel">
+      <div class="user-panel-header">
+        <div class="user-avatar">D</div>
+        <div>
+          <div class="user-name">Demo User</div>
+          <div class="user-email">demo@sandbox.revolut.com</div>
+        </div>
+        <button class="panel-close" id="panelClose" aria-label="Close panel">&times;</button>
+      </div>
+      <div class="user-panel-body">
+        <div class="info-row"><span>Environment</span><span class="badge-sandbox">Sandbox</span></div>
+        <div class="info-row"><span>Version</span><span>1.0.0</span></div>
+        <div class="info-row"><span>API Version</span><span>2024-09-01</span></div>
+      </div>
+    </div>
+
+    <!-- Page content -->
+    <main class="content">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+
+  <!-- Toast container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+
+</html>

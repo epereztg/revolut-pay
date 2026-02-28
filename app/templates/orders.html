@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}Orders — Revolut Pay Demo{% endblock %}
+{% block page_title %}Orders{% endblock %}
+
+{% block content %}
+<div class="orders-page-container">
+
+    <!-- Orders list panel -->
+    <div class="orders-list-panel" id="ordersListPanel">
+        <div class="panel-header">
+            <h2 class="section-heading">My Orders</h2>
+            <span class="order-count" id="orderCount">0</span>
+        </div>
+
+        <div class="empty-state" id="listEmptyState" style="display:none">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="2" y="3" width="20" height="18" rx="2" />
+                <line x1="8" y1="8" x2="16" y2="8" />
+                <line x1="8" y1="12" x2="16" y2="12" />
+                <line x1="8" y1="16" x2="12" y2="16" />
+            </svg>
+            <p>No orders yet. <a href="/pay">Create one →</a></p>
+        </div>
+
+        <ul class="order-list" id="orderList"></ul>
+    </div>
+
+    <!-- Order detail panel -->
+    <div class="order-detail-panel" id="orderDetailPanel">
+        <div class="detail-placeholder" id="detailPlaceholder">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+                <line x1="9" y1="13" x2="15" y2="13" />
+                <line x1="9" y1="17" x2="15" y2="17" />
+            </svg>
+            <p>Select an order to view details</p>
+        </div>
+
+        <div class="detail-content" id="detailContent" style="display:none">
+            <div class="detail-header">
+                <div>
+                    <div class="detail-title" id="detailTitle">Order</div>
+                    <div class="detail-id" id="detailId"></div>
+                </div>
+                <span class="status-badge" id="detailStatus"></span>
+            </div>
+
+            <div class="detail-section">
+                <h3 class="detail-section-title">Payment</h3>
+                <div class="detail-grid">
+                    <div class="detail-item"><span class="di-label">Amount</span><span class="di-value"
+                            id="diAmount"></span></div>
+                    <div class="detail-item"><span class="di-label">Currency</span><span class="di-value"
+                            id="diCurrency"></span></div>
+                    <div class="detail-item"><span class="di-label">Outstanding</span><span class="di-value"
+                            id="diOutstanding"></span></div>
+                    <div class="detail-item"><span class="di-label">Capture mode</span><span class="di-value"
+                            id="diCapture"></span></div>
+                </div>
+            </div>
+
+            <div class="detail-section">
+                <h3 class="detail-section-title">Timestamps</h3>
+                <div class="detail-grid">
+                    <div class="detail-item"><span class="di-label">Created</span><span class="di-value"
+                            id="diCreated"></span></div>
+                    <div class="detail-item"><span class="di-label">Updated</span><span class="di-value"
+                            id="diUpdated"></span></div>
+                </div>
+            </div>
+
+            <div class="detail-section" id="lineItemsSection" style="display:none">
+                <h3 class="detail-section-title">Line Items</h3>
+                <ul class="line-items-list" id="lineItemsList"></ul>
+            </div>
+
+            <div class="detail-section">
+                <h3 class="detail-section-title">Checkout</h3>
+                <div class="detail-item">
+                    <span class="di-label">Checkout URL</span>
+                    <a class="di-value checkout-link" id="diCheckoutUrl" href="#" target="_blank" rel="noopener">—</a>
+                </div>
+            </div>
+
+            <div class="detail-loading-overlay" id="detailLoading" style="display:none">
+                <div class="spinner"></div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/orders.js') }}"></script>
+{% endblock %}

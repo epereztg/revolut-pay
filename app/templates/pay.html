@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Revolut Pay — Checkout{% endblock %}
+{% block page_title %}Revolut Pay{% endblock %}
+
+{% block content %}
+<div class="checkout-container">
+    <div class="checkout-card">
+        <div class="checkout-header">
+            <div class="product-icon">🛍️</div>
+            <div>
+                <h1 class="checkout-title">Demo Product</h1>
+                <p class="checkout-subtitle">Enter an amount and pay with Revolut</p>
+            </div>
+        </div>
+
+        <div class="amount-row">
+            <label class="field-label" for="amountInput">Amount</label>
+            <div class="input-group">
+                <span class="currency-prefix">€</span>
+                <input type="number" id="amountInput" class="amount-input" placeholder="10.00" min="0.01" step="0.01"
+                    aria-label="Payment amount in EUR" />
+            </div>
+            <p class="field-hint">Enter amount in euros —&nbsp;e.g. <strong>10</strong> for €10.00</p>
+        </div>
+
+        <button class="btn-primary" id="generateBtn">
+            <span class="material-symbols-outlined btn-icon">add_circle</span>
+            Generate Order
+        </button>
+
+        <div class="status-message" id="statusMessage" role="status" aria-live="polite"></div>
+
+        <!-- Revolut Pay widget mounts here -->
+        <div id="revolut-pay" class="widget-container"></div>
+    </div>
+
+    <div class="order-info-card" id="orderInfoCard" style="display:none">
+        <h2 class="section-heading">Order Details</h2>
+        <div class="detail-row"><span>Order ID</span><code id="detailOrderId">—</code></div>
+        <div class="detail-row"><span>Amount</span><span id="detailAmount">—</span></div>
+        <div class="detail-row"><span>Currency</span><span id="detailCurrency">—</span></div>
+        <div class="detail-row"><span>Status</span><span class="status-badge" id="detailStatus">PENDING</span></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    window.REVOLUT_PUBLIC_API_KEY = "{{ public_api_key }}";
+</script>
+<script src="{{ url_for('static', filename='js/pay.js') }}"></script>
+{% endblock %}
