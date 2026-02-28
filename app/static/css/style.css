@@ -2,24 +2,24 @@
    Design tokens
 ───────────────────────────────────────────── */
 :root {
-  --bg: #0b0c10;
-  --bg-surface: #141619;
-  --bg-card: #1a1d23;
-  --bg-input: #1f2229;
-  --border: rgba(255, 255, 255, 0.07);
-  --border-focus: rgba(99, 102, 241, 0.6);
+  --bg: #f8fafc;
+  --bg-surface: #ffffff;
+  --bg-card: #ffffff;
+  --bg-input: #f1f5f9;
+  --border: #e2e8f0;
+  --border-focus: rgba(99, 102, 241, 0.4);
 
   --accent: #6366f1;
   --accent-dark: #4f46e5;
-  --accent-glow: rgba(99, 102, 241, 0.25);
+  --accent-glow: rgba(99, 102, 241, 0.1);
 
-  --green: #22c55e;
+  --green: #10b981;
   --red: #ef4444;
   --yellow: #f59e0b;
 
-  --text-primary: #f1f5f9;
-  --text-secondary: #94a3b8;
-  --text-muted: #4b5563;
+  --text-primary: #1e293b;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
 
   --sidebar-w: 240px;
   --topbar-h: 60px;
@@ -106,7 +106,7 @@ a:hover {
   font-weight: 700;
   font-size: 16px;
   color: #fff;
-  box-shadow: 0 0 12px var(--accent-glow);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
 }
 
 .logo-text {
@@ -143,7 +143,7 @@ a:hover {
 }
 
 .nav-item:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(0, 0, 0, 0.04);
   color: var(--text-primary);
   text-decoration: none;
 }
@@ -162,9 +162,9 @@ a:hover {
   display: inline-block;
   font-size: 11px;
   font-weight: 600;
-  background: rgba(245, 158, 11, 0.15);
-  color: var(--yellow);
-  border: 1px solid rgba(245, 158, 11, 0.3);
+  background: #fef3c7;
+  color: #d97706;
+  border: 1px solid #fde68a;
   padding: 4px 10px;
   border-radius: 20px;
 }
@@ -308,9 +308,9 @@ a:hover {
 .badge-sandbox {
   font-size: 11px;
   font-weight: 600;
-  background: rgba(245, 158, 11, 0.15);
-  color: var(--yellow);
-  border: 1px solid rgba(245, 158, 11, 0.3);
+  background: #fef3c7;
+  color: #d97706;
+  border: 1px solid #fde68a;
   padding: 3px 8px;
   border-radius: 20px;
 }
@@ -354,40 +354,87 @@ a:hover {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 36px;
+  padding: 0;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+}
+
+.product-visual {
+  width: 60%;
+  aspect-ratio: 1 / 1;
+  margin: 32px auto 0;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: #f8f8f8;
+}
+
+.product-hero-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .checkout-header {
+  padding: 24px 36px 12px;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 16px;
+  text-align: center;
 }
 
-.product-icon {
-  font-size: 36px;
-  background: var(--bg-input);
-  width: 60px;
-  height: 60px;
-  border-radius: var(--radius-sm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
+.brand-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
 }
 
 .checkout-title {
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 700;
-  letter-spacing: -0.4px;
+  color: #000;
+  margin-bottom: 8px;
 }
 
-.checkout-subtitle {
-  font-size: 14px;
-  color: var(--text-secondary);
-  margin-top: 4px;
+.price-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.current-price {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.original-price {
+  font-size: 16px;
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+
+/* Update padding for subsequent rows */
+.amount-row,
+.btn-primary,
+.status-message,
+.widget-container {
+  padding-left: 36px;
+  padding-right: 36px;
+}
+
+.amount-row {
+  padding-top: 12px;
+  padding-bottom: 24px;
+}
+
+.widget-container {
+  padding-bottom: 36px;
 }
 
 .field-label {

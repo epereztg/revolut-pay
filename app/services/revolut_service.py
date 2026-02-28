@@ -15,12 +15,14 @@ def _auth_headers() -> dict:
     }
 
 
-def create_order(amount: int, currency: str = "EUR") -> dict:
+def create_order(amount: int, currency: str = "EUR", line_items: list = None) -> dict:
     """Create an order in Revolut sandbox and return the full response."""
     payload = {
         "amount": amount,
         "currency": currency
     }
+    if line_items:
+        payload["line_items"] = line_items
     print("-----REQUEST PAYLOAD (create_order)-----")
     print(payload)
     print("-----REQUEST HEADERS (create_order)-----")

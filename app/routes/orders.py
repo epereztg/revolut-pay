@@ -46,8 +46,15 @@ def create_order_endpoint():
 
     currency = data.get("currency", "EUR").upper()
 
+    # Default line item for the demo
+    line_items = [{
+        "name": "Demo Product",
+        "quantity": 1,
+        "unit_amount": amount
+    }]
+
     try:
-        revolut_order = revolut_create_order(amount, currency)
+        revolut_order = revolut_create_order(amount, currency, line_items=line_items)
     except Exception as exc:
         return jsonify({"error": f"Revolut API error: {str(exc)}"}), 502
 
