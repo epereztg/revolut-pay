@@ -675,7 +675,7 @@ a:hover {
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 16px;
 }
 
@@ -724,6 +724,11 @@ a:hover {
   color: var(--red);
 }
 
+.stat-icon--pending {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--yellow);
+}
+
 .stat-label {
   font-size: 13px;
   color: var(--text-secondary);
@@ -742,6 +747,10 @@ a:hover {
 
 .stat-value--fail {
   color: var(--red);
+}
+
+.stat-value--pending {
+  color: var(--yellow);
 }
 
 /* Table card */

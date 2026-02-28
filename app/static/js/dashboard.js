@@ -4,6 +4,7 @@
  */
 
 const statTotal = document.getElementById('statTotal');
+const statPending = document.getElementById('statPending');
 const statSuccess = document.getElementById('statSuccess');
 const statFailed = document.getElementById('statFailed');
 const tableBody = document.getElementById('ordersTableBody');
@@ -11,8 +12,9 @@ const tableWrapper = document.getElementById('tableWrapper');
 const emptyState = document.getElementById('emptyState');
 
 /** Map Revolut order states to display labels */
-const SUCCESS_STATES = new Set(['completed', 'authorised']);
+const SUCCESS_STATES = new Set(['completed']);
 const FAILED_STATES = new Set(['failed', 'cancelled', 'declined']);
+const PENDING_STATES = new Set(['pending', 'authorised']);
 
 function statusClass(status) {
     const s = (status || '').toLowerCase();
@@ -28,6 +30,7 @@ function renderRows(orders) {
         tableWrapper.style.display = 'none';
         emptyState.style.display = 'flex';
         statTotal.textContent = '0';
+        statPending.textContent = '0';
         statSuccess.textContent = '0';
         statFailed.textContent = '0';
         return;
@@ -38,11 +41,13 @@ function renderRows(orders) {
 
     let successCount = 0;
     let failedCount = 0;
+    let pendingCount = 0;
 
     orders.forEach(order => {
         const s = (order.status || 'pending').toLowerCase();
         if (SUCCESS_STATES.has(s)) successCount++;
-        if (FAILED_STATES.has(s)) failedCount++;
+        else if (FAILED_STATES.has(s)) failedCount++;
+        else pendingCount++; // Everything else is pending
 
         const amountDisplay = order.amount != null
             ? `${(order.amount / 100).toFixed(2)} ${order.currency || 'EUR'}`
@@ -61,6 +66,7 @@ function renderRows(orders) {
     });
 
     statTotal.textContent = orders.length;
+    statPending.textContent = pendingCount;
     statSuccess.textContent = successCount;
     statFailed.textContent = failedCount;
 }
