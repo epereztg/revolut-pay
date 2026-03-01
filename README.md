@@ -1,79 +1,76 @@
-# Revolut Pay: Merchant Integration Deep-Dive
-
+# Revolut Pay: A Modern Merchant Integration
 
 [![Environment: Sandbox](https://img.shields.io/badge/Environment-Sandbox-orange.svg)](https://sandbox-business.revolut.com)
 
-This repository demonstrates a production-grade integration of the **Revolut Pay** checkout flow. It was built to showcase best practices for an **Integration Specialist** role, focusing on reliability, user experience, and technical clarity.
+Welcome! This project is a practical deep-dive into the **Revolut Pay Merchant API**. Rather than a basic "hello world," I've built a failure-resilient checkout experience that reflects the real-world challenges merchants face during payment integration.
 
 ---
 
-## 🏛 Architecture Overview
+## 💡 Why This Project?
 
-The solution follows a **Merchant-First** architecture, prioritizing ease of support and clear audit trails for all API interactions.
+Payments are often the most sensitive part of a customer's journey. I built this to showcase how an integration can be more than just "functional"—it should be **reliable, transparent, and user-centric.**
 
-- **Backend (Python/Flask)**: Handles secure Order creation, secret key management, and internal state persistence.
-- **Frontend (Vanilla JS/CSS)**: Utilizes the Revolut Checkout SDK to provide a native-feeling, high-conversion payment experience.
-- **Service Layer**: An abstracted communication layer interfaces with the Revolut Merchant API.
-
----
-
-## 🚀 Technical Features
-
-### 1. Dynamic Order Lifecycle
-Unlike static implementations, this demo generates Revolut Orders on-demand based on user input. This ensures that the **public token** and **order amount** are always synchronized.
-
-### 2. Rich Line-Item Integration
-To demonstrate full SDK capabilities, the implementation passes detailed `lineItems` (Metadata, Quantities, Unit Amounts). This is critical for merchants who require itemized reporting in their Revolut Merchant portal.
-
-### 3. Failure-Resilient Design
-- **Config Validation**: The app performs a "Health Check" on startup to ensure all API keys are correctly configured.
-- **Detailed Error Propagation**: Instead of generic "Payment Failed" messages, the UI surfaces specific SDK error codes and messages to help users troubleshoot.
+This demo focuses on:
+*   **Security**: Minimal data exposure and server-side order generation.
+*   **Resilience**: Handling network hangs and "zombie" processing states.
+*   **Transparency**: Detailed logging for easier debugging and support.
 
 ---
 
-## 🛠 Setup & Deployment
+## 🏛 The Build
 
-### Environment Configuration
-1. Clone the repository.
-2. `cp .env.template .env`
-3. Populate with your **Sandbox** credentials:
+The application follows a clean, decoupled architecture:
 
-| Variable | Description |
+*   **The Brain (Python/Flask)**: A secure backend service that handles the heavy lifting—communicating with the Revolut Merchant API and managing order states.
+*   **The Experience (Vanilla JS/CSS)**: A lightweight, responsive frontend that mounts the Revolut SDK dynamically. I avoided heavy frameworks to keep the integration logic clear and the performance snappy.
+*   **The Service Layer**: An abstraction over the API calls that ensures we have clean, itemized data and robust error handling.
+
+---
+
+## 🛠 Notable Features & Decisions
+
+### 1. The "Stuck in Processing" Guard 🛡️
+In real-world scenarios, network issues or API delays can leave a user staring at a loading spinner indefinitely. I implemented a **30-second processing timeout**. 
+*   **Result**: If the SDK gets stuck, it definitively closes the modal (`revolutPay.destroy()`), cancels the order on the backend for safety, and invites the user to try again. No more infinite loops.
+
+### 2. Dynamic Order Lifecycles
+Many integrations use hardcoded amounts. This implementation generates a fresh Revolut Order including descriptive `lineItems` (metadata, quantities, unit prices) based on user input. This ensures the merchant dashboard always reflects the actual checkout state.
+
+### 3. Fail-Fast Configuration
+The app validates its environment variables on startup. If a secret key is missing, it won't just crash silently—it tells you exactly what's missing, following best practices for dev-ops and supportability.
+
+---
+
+## 🚀 Getting Started
+
+### Environment Setup
+1. Clone the repo and navigate to the directory.
+2. Initialize your config: `cp .env.template .env`
+3. Add your **Sandbox** credentials:
+
+| Variable | Importance |
 | :--- | :--- |
-| `PUBLIC_API_KEY` | Used by the Frontend SDK to initialize the widget. |
-| `PRIVATE_SECRET_KEY` | Used by the Backend to authenticate `/orders` requests. |
+| `PUBLIC_API_KEY` | Connects the frontend widget to your account. |
+| `PRIVATE_SECRET_KEY` | Authorizes the backend to create secure orders. |
 
 ### Running Locally
 ```bash
-# Install dependencies
+# 1. Install dependencies
 pip install -r requirements.txt
 
-# Start the server
+# 2. Fire it up
 python3 run.py
 ```
-Visit `http://localhost:5000/pay` to start a test transaction.
+Open `http://localhost:5000/pay` to test the checkout experience.
 
 ---
 
-## 🧪 Quick-Look: Requirements Mapping
-
-| Assignment Requirement | Implementation Detail |
-| :--- | :--- |
-| **Visible Widget** | Mounted dynamically in `pay.js` under `#revolut-pay`. |
-| **Sandbox Environment** | Full connectivity to Revolut Sandbox verified. |
-| **Order Generation** | "Generate Order" button maps to `/api/orders` POST. |
-| **Success/Fail Scenarios** | Fully handled via SDK event listeners. |
-| **Bonus: Variable Amounts** | Enabled via responsive input field. |
-| **Bonus: Line Items** | Itemized list passed in both API and Widget params. |
+## 🗺 Future Roadmap
+Payment integrations are never truly "done." If I were scaling this for a production environment, I'd prioritize:
+*   **Webhooks**: Moving beyond client-side signals to ensure every order is captured, even if the user closes their browser mid-payment.
+*   **Idempotency**: Implementing request keys to prevent duplicate charges in high-latency environments.
+*   **Extended API**: Adding flows for partial captures and instant refunds directly from the merchant dashboard.
 
 ---
 
-## 📚 Future Roadmap
-If this were a production integration for a Tier-1 merchant, the following would be added:
-- **Complete Payment Flows**: Such as Capture, Refunds, Void, etc.
-- **Webhook Integration**: To ensure order status (e.g., `COMPLETED`) is updated even if the user closes their browser before redirection.
-- **Idempotency Keys**: To prevent duplicate charges in high-latency mobile networks.
-- **OAuth 2.0 Flow**: For merchants managing multiple business units.
-
----
-
+*Built with ❤️ to demonstrate the intersection of code, commerce, and user experience.*
