@@ -21,12 +21,15 @@ npm run build
 ```
 
 ### 3. Environment Variables
-Create a `.env` file in the root directory:
-```env
-PUBLIC_API_KEY=your_revolut_public_key
-PRIVATE_SECRET_KEY=your_revolut_private_key
-FLASK_SECRET_KEY=generate_a_random_string
+Generate the `.env` file from the template and fill in your keys:
+```bash
+cp .env.template .env
 ```
+
+The file requires:
+- `PUBLIC_API_KEY`: Your Revolut Merchant public key.
+- `PRIVATE_SECRET_KEY`: Your Revolut Merchant private key.
+- `FLASK_SECRET_KEY`: A random string for session security.
 
 ### 4. Run the Application
 ```bash

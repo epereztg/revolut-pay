@@ -166,3 +166,20 @@ generateBtn.addEventListener('click', async () => {
         generateBtn.disabled = false;
     }
 });
+
+function addOrderToStorage(id) {
+    let ids = [];
+    try {
+        ids = JSON.parse(localStorage.getItem('revolut_orders') || '[]');
+    } catch (e) { }
+    if (!ids.includes(id)) {
+        ids.unshift(id);
+        localStorage.setItem('revolut_orders', JSON.stringify(ids.slice(0, 50)));
+    }
+}
+
+function showToast(type, title, message) {
+    if (window.showToast) {
+        window.showToast(type, title, message);
+    }
+}
