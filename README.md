@@ -13,7 +13,7 @@ The solution follows a **Merchant-First** architecture, prioritizing ease of sup
 
 - **Backend (Python/Flask)**: Handles secure Order creation, secret key management, and internal state persistence.
 - **Frontend (Vanilla JS/CSS)**: Utilizes the Revolut Checkout SDK to provide a native-feeling, high-conversion payment experience.
-- **Service Layer**: An abstracted communication layer interfaces with the Revolut Merchant API (`v2024-09-01`).
+- **Service Layer**: An abstracted communication layer interfaces with the Revolut Merchant API.
 
 ---
 
@@ -55,7 +55,7 @@ Visit `http://localhost:5000/pay` to start a test transaction.
 
 ---
 
-## 🧪 Interview Quick-Look: Requirements Mapping
+## 🧪 Quick-Look: Requirements Mapping
 
 | Assignment Requirement | Implementation Detail |
 | :--- | :--- |
