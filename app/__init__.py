@@ -6,6 +6,7 @@ from .routes.webhooks import webhooks_bp
 
 
 def create_app() -> Flask:
+    Config.validate()
     app = Flask(__name__)
     app.secret_key = Config.FLASK_SECRET_KEY
 

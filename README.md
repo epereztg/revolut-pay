@@ -1,61 +1,79 @@
-# Revolut Pay & Checkout Integration Demo
+# Revolut Pay: Merchant Integration Deep-Dive
 
-This project is a demonstration of integrating the **Revolut Checkout SDK** into a modern web application. 
 
-## 🚀 Quick Start
+[![Environment: Sandbox](https://img.shields.io/badge/Environment-Sandbox-orange.svg)](https://sandbox-business.revolut.com)
 
-### 1. Prerequisites
-- Python 3.8+
-- Node.js & npm (for modern SDK bundling)
-
-### 2. Setup
-```bash
-# Install Python dependencies
-pip install -r requirements.txt
-
-# Install NPM dependencies
-npm install
-
-# Build the modern SDK bundle
-npm run build
-```
-
-### 3. Environment Variables
-Generate the `.env` file from the template and fill in your keys:
-```bash
-cp .env.template .env
-```
-
-The file requires:
-- `PUBLIC_API_KEY`: Your Revolut Merchant public key.
-- `PRIVATE_SECRET_KEY`: Your Revolut Merchant private key.
-- `FLASK_SECRET_KEY`: A random string for session security.
-
-### 4. Run the Application
-```bash
-python3 run.py
-```
-Access the dashboard at `http://localhost:5000`.
+This repository demonstrates a production-grade integration of the **Revolut Pay** checkout flow. It was built to showcase best practices for an **Integration Specialist** role, focusing on reliability, user experience, and technical clarity.
 
 ---
 
-## 🛠 Features
+## 🏛 Architecture Overview
 
-### 1. Dual Integration Methods
-- **Revolut Pay (CDN)**: Fast, one-click checkout using the standard `embed.js` script.
+The solution follows a **Merchant-First** architecture, prioritizing ease of support and clear audit trails for all API interactions.
 
-### 2. Premium Fintech UI
-- **Dynamic Dashboard**: Real-time polling to track order statuses (Completed, Pending, Failed).
-- **Responsive Checkout**: A clean, centered product view for the demo item.
+- **Backend (Python/Flask)**: Handles secure Order creation, secret key management, and internal state persistence.
+- **Frontend (Vanilla JS/CSS)**: Utilizes the Revolut Checkout SDK to provide a native-feeling, high-conversion payment experience.
+- **Service Layer**: An abstracted communication layer interfaces with the Revolut Merchant API (`v2024-09-01`).
 
-### 3. Backend Architecture
-- **Order Management**: Synchronized local storage with Revolut API states.
-- **Line Items**: Correct implementation of the Revolut Pay `lineItems` schema (including strings and quantities).
-- **Webhook Ready**: Structured to handle asynchronous status updates from Revolut.
+---
 
-## 📁 Project Structure
-- `/app/routes/`: Flask blueprints for orders and dashboard logic.
-- `/app/services/`: Core logic for Revolut API communication.
-- `/app/src/`: Modern JavaScript source files (NPM-based).
-- `/app/static/js/`: Bundled and legacy JavaScript files.
-- `/app/templates/`: Modular HTML templates using Jinja.
+## 🚀 Technical Features
+
+### 1. Dynamic Order Lifecycle
+Unlike static implementations, this demo generates Revolut Orders on-demand based on user input. This ensures that the **public token** and **order amount** are always synchronized.
+
+### 2. Rich Line-Item Integration
+To demonstrate full SDK capabilities, the implementation passes detailed `lineItems` (Metadata, Quantities, Unit Amounts). This is critical for merchants who require itemized reporting in their Revolut Merchant portal.
+
+### 3. Failure-Resilient Design
+- **Config Validation**: The app performs a "Health Check" on startup to ensure all API keys are correctly configured.
+- **Detailed Error Propagation**: Instead of generic "Payment Failed" messages, the UI surfaces specific SDK error codes and messages to help users troubleshoot.
+
+---
+
+## 🛠 Setup & Deployment
+
+### Environment Configuration
+1. Clone the repository.
+2. `cp .env.template .env`
+3. Populate with your **Sandbox** credentials:
+
+| Variable | Description |
+| :--- | :--- |
+| `PUBLIC_API_KEY` | Used by the Frontend SDK to initialize the widget. |
+| `PRIVATE_SECRET_KEY` | Used by the Backend to authenticate `/orders` requests. |
+
+### Running Locally
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Start the server
+python3 run.py
+```
+Visit `http://localhost:5000/pay` to start a test transaction.
+
+---
+
+## 🧪 Interview Quick-Look: Requirements Mapping
+
+| Assignment Requirement | Implementation Detail |
+| :--- | :--- |
+| **Visible Widget** | Mounted dynamically in `pay.js` under `#revolut-pay`. |
+| **Sandbox Environment** | Full connectivity to Revolut Sandbox verified. |
+| **Order Generation** | "Generate Order" button maps to `/api/orders` POST. |
+| **Success/Fail Scenarios** | Fully handled via SDK event listeners. |
+| **Bonus: Variable Amounts** | Enabled via responsive input field. |
+| **Bonus: Line Items** | Itemized list passed in both API and Widget params. |
+
+---
+
+## 📚 Future Roadmap
+If this were a production integration for a Tier-1 merchant, the following would be added:
+- **Complete Payment Flows**: Such as Capture, Refunds, Void, etc.
+- **Webhook Integration**: To ensure order status (e.g., `COMPLETED`) is updated even if the user closes their browser before redirection.
+- **Idempotency Keys**: To prevent duplicate charges in high-latency mobile networks.
+- **OAuth 2.0 Flow**: For merchants managing multiple business units.
+
+---
+

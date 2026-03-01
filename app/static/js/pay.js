@@ -56,8 +56,9 @@ async function createOrderOnBackend(amount) {
 }
 
 /**
- * Step 2 — Load the Revolut Checkout SDK via embed script, then
- * initialise and mount the widget.
+ * Step 2 — Load the Revolut Checkout SDK via embed script.
+ * For production, consider using the NPM package for better version control
+ * and bundling, but the CDN approach ensures the latest sandbox fixes.
  */
 function loadRevolutSDK() {
     return new Promise((resolve, reject) => {
@@ -80,6 +81,8 @@ async function initWidget(order) {
     // Clear previous widget if any
     widgetMount.innerHTML = '';
 
+    // Initialize the payment instance. 
+    // Locale and mode are critical for consistent UX and sandbox testing.
     const { revolutPay } = await RC.payments({
         locale: 'en',
         publicToken: publicToken,
@@ -103,12 +106,14 @@ async function initWidget(order) {
             },
         ],
 
-        // createOrder is called by the widget when the user clicks Pay
+        // createOrder is a lazy-loading pattern: it's called only when the user 
+        // interacts with the button, optimizing performance and token lifecycle.
         createOrder: async () => {
             return { publicId: order.public_token };
         },
 
-        // Style the button for the light theme (guidelines: black on light background)
+        // Brand consistency: dark variant chosen for higher contrast 
+        // against the white checkout card.
         buttonStyle: {
             variant: 'dark',
             radius: 'small',

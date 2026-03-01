@@ -15,41 +15,55 @@ def _auth_headers() -> dict:
     }
 
 
+def _log_api_call(method: str, endpoint: str, payload: dict = None, response: dict = None):
+    """Utility to log API interactions for easier debugging/integration support."""
+    print(f"\n--- [REVOLUT API] {method} {endpoint} ---")
+    if payload:
+        print(f"Request Payload: {payload}")
+    if response:
+        print(f"Response: {response}")
+    print("-------------------------------------------\n")
+
+
 def create_order(amount: int, currency: str = "GBP", line_items: list = None) -> dict:
-    """Create an order in Revolut sandbox and return the full response."""
+    """
+    Create an order in Revolut sandbox.
+    
+    Args:
+        amount: Total amount in minor units (e.g., 1000 for 10.00 GBP).
+        currency: 3-letter ISO currency code.
+        line_items: List of product details for the checkout.
+    """
     payload = {
         "amount": amount,
         "currency": currency,
         "line_items": line_items
     }
-    print("-----REQUEST PAYLOAD (create_order)-----")
-    print(payload)
-    print("-----REQUEST HEADERS (create_order)-----")
-    print(_auth_headers())
-    print("-----------------")
+    
     response = requests.post(
         f"{SANDBOX_BASE}/orders",
         json=payload,
         headers=_auth_headers(),
         timeout=10,
     )
-    print("-----RESPONSE (create_order)-----")
-    print(response.json())
-    print("-----------------")
+    
+    res_json = response.json()
+    _log_api_call("POST", "/orders", payload, res_json)
+    
     response.raise_for_status()
-    return response.json()
+    return res_json
 
 
 def retrieve_order(order_id: str) -> dict:
-    """Retrieve a single order from Revolut sandbox by ID."""
-
+    """Retrieve order details from Revolut to sync status."""
     response = requests.get(
         f"{SANDBOX_BASE}/orders/{order_id}",
         headers=_auth_headers(),
         timeout=10,
     )
-    print("-----RETRIEVE ORDER (retrieve_order)-----:", order_id)
-    print(response.json())
-    print("-----------------")
+    
+    res_json = response.json()
+    _log_api_call("GET", f"/orders/{order_id}", response=res_json)
+    
     response.raise_for_status()
-    return response.json()
+    return res_json
