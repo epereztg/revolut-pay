@@ -40,11 +40,11 @@ function updateStatusBadge(el, status) {
  * Step 1 — POST /api/orders with amount in minor units (cents).
  * Amount input is in euros; we multiply by 100.
  */
-async function createOrderOnBackend(amountEuros) {
+async function createOrderOnBackend(amount) {
     const resp = await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount: Math.round(amountEuros * 100), currency: 'EUR' }),
+        body: JSON.stringify({ amount: Math.round(amount * 100), currency: 'GBP' }),
     });
 
     if (!resp.ok) {
@@ -135,9 +135,9 @@ async function initWidget(order) {
 
 // ─── Main click handler ───────────────────────────────────────────────────────
 generateBtn.addEventListener('click', async () => {
-    const amountEuros = parseFloat(amountInput.value);
+    const amount = parseFloat(amountInput.value);
 
-    if (!amountEuros || amountEuros <= 0) {
+    if (!amount || amount <= 0) {
         setStatus('Please enter a valid amount greater than 0.', 'error');
         return;
     }
@@ -148,7 +148,7 @@ generateBtn.addEventListener('click', async () => {
     setStatus('Creating order…');
 
     try {
-        const order = await createOrderOnBackend(amountEuros);
+        const order = await createOrderOnBackend(amount);
 
         // Persist to localStorage so dashboard can fetch it
         addOrderToStorage(order.order_id);
@@ -166,20 +166,3 @@ generateBtn.addEventListener('click', async () => {
         generateBtn.disabled = false;
     }
 });
-
-function addOrderToStorage(id) {
-    let ids = [];
-    try {
-        ids = JSON.parse(localStorage.getItem('revolut_orders') || '[]');
-    } catch (e) { }
-    if (!ids.includes(id)) {
-        ids.unshift(id);
-        localStorage.setItem('revolut_orders', JSON.stringify(ids.slice(0, 50)));
-    }
-}
-
-function showToast(type, title, message) {
-    if (window.showToast) {
-        window.showToast(type, title, message);
-    }
-}

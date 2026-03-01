@@ -15,7 +15,7 @@ def _auth_headers() -> dict:
     }
 
 
-def create_order(amount: int, currency: str = "EUR", line_items: list = None) -> dict:
+def create_order(amount: int, currency: str = "GBP", line_items: list = None) -> dict:
     """Create an order in Revolut sandbox and return the full response."""
     payload = {
         "amount": amount,

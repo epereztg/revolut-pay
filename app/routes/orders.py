@@ -44,7 +44,7 @@ def create_order_endpoint():
     if amount <= 0:
         return jsonify({"error": "amount must be a positive integer"}), 400
 
-    currency = data.get("currency", "EUR").upper()
+    currency = data.get("currency", "GBP").upper()
 
     # Default line item for the demo
     line_items = [{

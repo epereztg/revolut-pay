@@ -46,7 +46,7 @@ Access the dashboard at `http://localhost:5000`.
 
 ### 2. Premium Fintech UI
 - **Dynamic Dashboard**: Real-time polling to track order statuses (Completed, Pending, Failed).
-- **Responsive Checkout**: A clean, centered product view for the "Snowboard Jacket" demo item.
+- **Responsive Checkout**: A clean, centered product view for the demo item.
 
 ### 3. Backend Architecture
 - **Order Management**: Synchronized local storage with Revolut API states.
