@@ -129,7 +129,7 @@ function populateDetail(order) {
     diAmount.textContent = formatAmount(order.order_amount.value, order.order_amount.currency);
 
     diCurrency.textContent = currency;
-    diOutstanding.textContent = formatAmount(order.outstanding_amount, currency);
+    diOutstanding.textContent = formatAmount(order.order_outstanding_amount.value, order.order_outstanding_amount.currency);
     diCapture.textContent = order.capture_mode || '—';
     diCreated.textContent = formatDate(order.created_at);
     diUpdated.textContent = formatDate(order.updated_at);

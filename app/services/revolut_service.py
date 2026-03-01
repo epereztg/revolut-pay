@@ -19,10 +19,9 @@ def create_order(amount: int, currency: str = "EUR", line_items: list = None) ->
     """Create an order in Revolut sandbox and return the full response."""
     payload = {
         "amount": amount,
-        "currency": currency
+        "currency": currency,
+        "line_items": line_items
     }
-    if line_items:
-        payload["line_items"] = line_items
     print("-----REQUEST PAYLOAD (create_order)-----")
     print(payload)
     print("-----REQUEST HEADERS (create_order)-----")
