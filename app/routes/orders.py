@@ -105,3 +105,15 @@ def get_order_detail_endpoint(order_id: str):
         store.update_order_status(order_id, new_state)
 
     return jsonify(revolut_data), 200
+
+
+@orders_bp.route("/api/orders/<order_id>/cancel", methods=["POST"])
+def cancel_order_endpoint(order_id: str):
+    """Cancel an order on Revolut."""
+    try:
+        from ..services.revolut_service import cancel_order as revolut_cancel_order
+        revolut_cancel_order(order_id)
+        store.update_order_status(order_id, "CANCELLED")
+        return jsonify({"status": "cancelled"}), 200
+    except Exception as exc:
+        return jsonify({"error": f"Failed to cancel: {str(exc)}"}), 502

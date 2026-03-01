@@ -89,6 +89,8 @@ async function initWidget(order) {
         mode: 'sandbox',
     });
 
+    let processingTimeoutId = null;
+
     const paymentOptions = {
         currency: order.currency,
         totalAmount: order.amount,  // already in minor units from backend
@@ -109,6 +111,33 @@ async function initWidget(order) {
         // createOrder is a lazy-loading pattern: it's called only when the user 
         // interacts with the button, optimizing performance and token lifecycle.
         createOrder: async () => {
+            console.log('Payment button clicked, starting processing timeout timer.');
+            processingTimeoutId = setTimeout(async () => {
+                console.warn('Processing timed out after 30s. Closing modal and cancelling payment.');
+
+                // Definitive cleanup of SDK widgets/modals
+                if (revolutPay && typeof revolutPay.destroy === 'function') {
+                    try { revolutPay.destroy(); } catch (e) { console.error('Destroy failed', e); }
+                } else if (revolutPay && typeof revolutPay.unmount === 'function') {
+                    try { revolutPay.unmount(); } catch (e) { console.error('Unmount failed', e); }
+                }
+
+                widgetMount.innerHTML = '';
+                orderInfoCard.style.display = 'none'; // Back to amount entry
+                setStatus('Payment processing timed out. The request was cancelled for safety. Please try again.', 'error');
+                showToast('error', 'Processing Timeout', 'The payment took too long to process (30s). The attempt was cancelled.');
+
+                // Allow user to try again
+                generateBtn.disabled = false;
+
+                // Backend cancellation to ensure no late charges/completions
+                try {
+                    await fetch(`/api/orders/${order.order_id}/cancel`, { method: 'POST' });
+                } catch (e) {
+                    console.error('Failed to notify backend about cancellation', e);
+                }
+            }, 30000);
+
             return { publicId: order.public_token };
         },
 
@@ -123,6 +152,12 @@ async function initWidget(order) {
     revolutPay.mount(widgetMount, paymentOptions);
 
     revolutPay.on('payment', (payload) => {
+        if (processingTimeoutId) {
+            console.log('Payment event received, clearing processing timeout.');
+            clearTimeout(processingTimeoutId);
+            processingTimeoutId = null;
+        }
+
         if (payload.type === 'success') {
             setStatus('✅ Payment successful!', 'success');
             updateStatusBadge(detailStatus, 'completed');

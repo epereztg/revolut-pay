@@ -67,3 +67,23 @@ def retrieve_order(order_id: str) -> dict:
     
     response.raise_for_status()
     return res_json
+
+
+def cancel_order(order_id: str) -> dict:
+    """Cancel an existing order in Revolut."""
+    response = requests.post(
+        f"{SANDBOX_BASE}/orders/{order_id}/cancel",
+        headers=_auth_headers(),
+        timeout=10,
+    )
+    
+    # Some endpoints might return empty on 204 or a JSON on 200/201
+    try:
+        res_json = response.json()
+    except Exception:
+        res_json = {"status": "success"}
+        
+    _log_api_call("POST", f"/orders/{order_id}/cancel", response=res_json)
+    
+    response.raise_for_status()
+    return res_json
