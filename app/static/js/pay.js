@@ -38,7 +38,6 @@ function updateStatusBadge(el, status) {
 
 /**
  * Step 1 — POST /api/orders with amount in minor units (cents).
- * Amount input is in euros; we multiply by 100.
  */
 async function createOrderOnBackend(amount) {
     const resp = await fetch('/api/orders', {
@@ -76,14 +75,14 @@ function loadRevolutSDK() {
 async function initWidget(order) {
     const publicToken = window.REVOLUT_PUBLIC_API_KEY;
 
-    const RC = await loadRevolutSDK();
+    const RevolutCheckout = await loadRevolutSDK();
 
     // Clear previous widget if any
     widgetMount.innerHTML = '';
 
     // Initialize the payment instance. 
     // Locale and mode are critical for consistent UX and sandbox testing.
-    const { revolutPay } = await RC.payments({
+    const { revolutPay } = await RevolutCheckout.payments({
         locale: 'en',
         publicToken: publicToken,
         mode: 'sandbox',
@@ -113,7 +112,7 @@ async function initWidget(order) {
         createOrder: async () => {
             console.log('Payment button clicked, starting processing timeout timer.');
             processingTimeoutId = setTimeout(async () => {
-                console.warn('Processing timed out after 30s. Closing modal and cancelling payment.');
+                console.warn('Processing timed out after 90s. Closing modal and cancelling payment.');
 
                 // Definitive cleanup of SDK widgets/modals
                 if (revolutPay && typeof revolutPay.destroy === 'function') {
@@ -125,7 +124,7 @@ async function initWidget(order) {
                 widgetMount.innerHTML = '';
                 orderInfoCard.style.display = 'none'; // Back to amount entry
                 setStatus('Payment processing timed out. The request was cancelled for safety. Please try again.', 'error');
-                showToast('error', 'Processing Timeout', 'The payment took too long to process (30s). The attempt was cancelled.');
+                showToast('error', 'Processing Timeout', 'The payment took too long to process (90s). The attempt was cancelled.');
 
                 // Allow user to try again
                 generateBtn.disabled = false;

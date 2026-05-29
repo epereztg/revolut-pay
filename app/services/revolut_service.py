@@ -37,7 +37,8 @@ def create_order(amount: int, currency: str = "GBP", line_items: list = None) ->
     payload = {
         "amount": amount,
         "currency": currency,
-        "line_items": line_items
+        "line_items": line_items,
+        "return_url": "http://localhost:5000/return"
     }
     
     response = requests.post(
