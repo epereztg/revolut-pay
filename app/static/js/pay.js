@@ -136,7 +136,7 @@ async function initWidget(order) {
                 } catch (e) {
                     console.error('Failed to notify backend about cancellation', e);
                 }
-            }, 30000);
+            }, 90000);
 
             return { publicId: order.public_token };
         },

@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}Hosted Payment Page — API{% endblock %}
+{% block page_title %}Hosted Payment Page API{% endblock %}
+
+{% block content %}
+<div class="checkout-container">
+    <div class="checkout-card">
+        <div class="product-visual">
+            <img src="{{ url_for('static', filename='img/product_jacket.png') }}" alt="Snowboard Jacket Soft Pink"
+                class="product-hero-img">
+        </div>
+        <div class="checkout-header">
+            <div>
+                <h1 class="checkout-title">Snowboard Jacket Soft Pink</h1>
+                <p class="checkout-subtitle">Enter an amount and checkout via HPP</p>
+            </div>
+        </div>
+
+        <div class="amount-row">
+            <label class="field-label" for="amountInput">Amount</label>
+            <div class="controls-row">
+                <div class="input-group">
+                    <span class="currency-prefix">£</span>
+                    <input type="number" id="amountInput" class="amount-input" placeholder="10.00" min="0.01"
+                        step="0.01" aria-label="Payment amount in GBP" />
+                </div>
+                <button class="btn-primary" id="generateBtn">
+                    <span class="material-symbols-outlined btn-icon">open_in_new</span>
+                    Checkout with HPP
+                </button>
+            </div>
+            <p class="field-hint">Enter amount in pounds —&nbsp;e.g. <strong>10</strong> for £10.00</p>
+        </div>
+
+        <div class="status-message" id="statusMessage" role="status" aria-live="polite"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.getElementById('generateBtn').addEventListener('click', async () => {
+        const btn = document.getElementById('generateBtn');
+        const amountInput = document.getElementById('amountInput');
+        const statusMsg = document.getElementById('statusMessage');
+        const amount = parseFloat(amountInput.value);
+
+        if (!amount || amount <= 0) {
+            statusMsg.textContent = 'Please enter a valid amount greater than 0.';
+            statusMsg.className = 'status-message error';
+            return;
+        }
+
+        btn.disabled = true;
+        statusMsg.textContent = 'Redirecting to Hosted Payment Page...';
+        statusMsg.className = 'status-message';
+
+        try {
+            const resp = await fetch('/api/orders', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ amount: Math.round(amount * 100), currency: 'GBP' }),
+            });
+
+            if (!resp.ok) {
+                const err = await resp.json().catch(() => ({}));
+                throw new Error(err.error || `HTTP ${resp.status}`);
+            }
+
+            const data = await resp.json();
+            
+            if (window.addOrderToStorage) {
+                window.addOrderToStorage(data.order_id);
+            }
+
+            if (data.checkout_url) {
+                window.location.href = data.checkout_url;
+            } else {
+                throw new Error('No checkout URL returned.');
+            }
+        } catch (err) {
+            statusMsg.textContent = `Error: ${err.message}`;
+            statusMsg.className = 'status-message error';
+            if (window.showToast) {
+                window.showToast('error', 'Checkout failed', err.message);
+            }
+            btn.disabled = false;
+        }
+    });
+</script>
+{% endblock %}

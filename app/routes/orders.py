@@ -26,6 +26,19 @@ def dashboard_page():
 def orders_page():
     return render_template("orders.html")
 
+@orders_bp.route("/hpp/api")
+def hpp_api_page():
+    return render_template("hpp_api.html")
+
+@orders_bp.route("/hpp/link")
+def hpp_link_page():
+    return render_template("hpp_link.html")
+
+@orders_bp.route("/checkout/embedded")
+def checkout_embedded_page():
+    from ..config import Config
+    return render_template("checkout_embedded.html", public_api_key=Config.PUBLIC_API_KEY)
+
 
 @orders_bp.route("/api/orders", methods=["POST"])
 def create_order_endpoint():
@@ -60,6 +73,7 @@ def create_order_endpoint():
 
     order_id = revolut_order["id"]
     public_token = revolut_order["public_id"]
+    checkout_url = revolut_order.get("checkout_url", "")
 
     store.add_order(
         order_id=order_id,
@@ -71,6 +85,7 @@ def create_order_endpoint():
     return jsonify({
         "order_id": order_id,
         "public_token": public_token,
+        "checkout_url": checkout_url,
         "amount": amount,
         "currency": currency,
     }), 201

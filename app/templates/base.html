@@ -24,6 +24,7 @@
       <span class="logo-text">RevPay Demo</span>
     </div>
     <nav class="sidebar-nav">
+      <div class="nav-section-title">Revolut Pay</div>
       <a href="/dashboard" class="nav-item {% if request.path == '/dashboard' %}active{% endif %}">
         <span class="material-symbols-outlined nav-icon">dashboard</span>
         <span class="nav-text">Dashboard</span>
@@ -37,6 +38,21 @@
         <span class="nav-text">Orders</span>
       </a>
 
+      <div class="nav-section-title">Hosted Payment Page</div>
+      <a href="/hpp/link" class="nav-item {% if request.path == '/hpp/link' %}active{% endif %}">
+        <span class="material-symbols-outlined nav-icon">link</span>
+        <span class="nav-text">Payment Link</span>
+      </a>
+      <a href="/hpp/api" class="nav-item {% if request.path == '/hpp/api' %}active{% endif %}">
+        <span class="material-symbols-outlined nav-icon">code</span>
+        <span class="nav-text">API Integration</span>
+      </a>
+
+      <div class="nav-section-title">Revolut Checkout</div>
+      <a href="/checkout/embedded" class="nav-item {% if request.path == '/checkout/embedded' %}active{% endif %}">
+        <span class="material-symbols-outlined nav-icon">web_asset</span>
+        <span class="nav-text">Embedded Checkout</span>
+      </a>
     </nav>
     <div class="sidebar-footer">
       <div class="sidebar-badge">Sandbox Mode</div>

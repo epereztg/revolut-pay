@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block title %}Hosted Payment Page — Link{% endblock %}
+{% block page_title %}Payment Link Generator{% endblock %}
+
+{% block content %}
+<div class="checkout-container">
+    <div class="checkout-card">
+        <div class="product-visual">
+            <img src="{{ url_for('static', filename='img/product_jacket.png') }}" alt="Snowboard Jacket Soft Pink"
+                class="product-hero-img">
+        </div>
+        <div class="checkout-header">
+            <div>
+                <h1 class="checkout-title">Snowboard Jacket Soft Pink</h1>
+                <p class="checkout-subtitle">Enter an amount to generate a shareable link</p>
+            </div>
+        </div>
+
+        <div class="amount-row">
+            <label class="field-label" for="amountInput">Amount</label>
+            <div class="controls-row">
+                <div class="input-group">
+                    <span class="currency-prefix">£</span>
+                    <input type="number" id="amountInput" class="amount-input" placeholder="10.00" min="0.01"
+                        step="0.01" aria-label="Payment amount in GBP" />
+                </div>
+                <button class="btn-primary" id="generateBtn">
+                    <span class="material-symbols-outlined btn-icon">link</span>
+                    Generate Link
+                </button>
+            </div>
+            <p class="field-hint">Enter amount in pounds —&nbsp;e.g. <strong>10</strong> for £10.00</p>
+        </div>
+
+        <div class="status-message" id="statusMessage" role="status" aria-live="polite"></div>
+
+        <div id="linkContainer" style="display: none; padding: 0 36px 36px 36px;">
+            <label class="field-label">Share this payment link</label>
+            <div class="controls-row" style="margin-top: 8px;">
+                <div class="input-group" style="flex: 1;">
+                    <input type="text" id="paymentLink" class="amount-input" style="font-size: 14px; padding-left: 16px;" readonly />
+                </div>
+                <button class="btn-primary" id="copyBtn" style="padding: 0 16px;">
+                    Copy
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.getElementById('generateBtn').addEventListener('click', async () => {
+        const btn = document.getElementById('generateBtn');
+        const amountInput = document.getElementById('amountInput');
+        const statusMsg = document.getElementById('statusMessage');
+        const linkContainer = document.getElementById('linkContainer');
+        const paymentLink = document.getElementById('paymentLink');
+        const copyBtn = document.getElementById('copyBtn');
+        
+        const amount = parseFloat(amountInput.value);
+
+        if (!amount || amount <= 0) {
+            statusMsg.textContent = 'Please enter a valid amount greater than 0.';
+            statusMsg.className = 'status-message error';
+            return;
+        }
+
+        btn.disabled = true;
+        statusMsg.textContent = 'Generating payment link...';
+        statusMsg.className = 'status-message';
+        linkContainer.style.display = 'none';
+        copyBtn.textContent = 'Copy';
+
+        try {
+            const resp = await fetch('/api/orders', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ amount: Math.round(amount * 100), currency: 'GBP' }),
+            });
+
+            if (!resp.ok) {
+                const err = await resp.json().catch(() => ({}));
+                throw new Error(err.error || `HTTP ${resp.status}`);
+            }
+
+            const data = await resp.json();
+            
+            if (window.addOrderToStorage) {
+                window.addOrderToStorage(data.order_id);
+            }
+
+            if (data.checkout_url) {
+                statusMsg.textContent = 'Link generated successfully!';
+                statusMsg.className = 'status-message success';
+                paymentLink.value = data.checkout_url;
+                linkContainer.style.display = 'block';
+                if (window.showToast) {
+                    window.showToast('success', 'Link Generated', 'You can now share this link.');
+                }
+            } else {
+                throw new Error('No checkout URL returned.');
+            }
+        } catch (err) {
+            statusMsg.textContent = `Error: ${err.message}`;
+            statusMsg.className = 'status-message error';
+            if (window.showToast) {
+                window.showToast('error', 'Generation failed', err.message);
+            }
+        } finally {
+            btn.disabled = false;
+        }
+    });
+
+    document.getElementById('copyBtn').addEventListener('click', () => {
+        const paymentLink = document.getElementById('paymentLink');
+        paymentLink.select();
+        document.execCommand('copy');
+        
+        const copyBtn = document.getElementById('copyBtn');
+        copyBtn.textContent = 'Copied!';
+        if (window.showToast) {
+            window.showToast('success', 'Copied to clipboard');
+        }
+        setTimeout(() => copyBtn.textContent = 'Copy', 2000);
+    });
+</script>
+{% endblock %}
