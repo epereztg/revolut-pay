@@ -6,14 +6,14 @@ from ..config import Config
 SANDBOX_BASE = Config.REVOLUT_SANDBOX_BASE_URL
 
 
+
 def _auth_headers() -> dict:
     return {
         "Authorization": f"Bearer {Config.PRIVATE_SECRET_KEY}",
         "Content-Type": "application/json",
         "Accept": "application/json",
-        "Revolut-Api-Version": "2024-09-01"
+        "Revolut-Api-Version": "2026-04-20"
     }
-
 
 def _log_api_call(method: str, endpoint: str, payload: dict = None, response: dict = None):
     """Utility to log API interactions for easier debugging/integration support."""
@@ -37,10 +37,9 @@ def create_order(amount: int, currency: str = "GBP", line_items: list = None) ->
     payload = {
         "amount": amount,
         "currency": currency,
-        "line_items": line_items,
-        "return_url": "http://localhost:5000/return"
+        "redirect_url": "https://hoppg.com"
     }
-    
+    _log_api_call("POST", "/orders", payload)
     response = requests.post(
         f"{SANDBOX_BASE}/orders",
         json=payload,

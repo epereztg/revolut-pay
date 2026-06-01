@@ -72,7 +72,7 @@ def create_order_endpoint():
         return jsonify({"error": f"Revolut API error: {str(exc)}"}), 502
 
     order_id = revolut_order["id"]
-    public_token = revolut_order["public_id"]
+    public_token = revolut_order["token"]
     checkout_url = revolut_order.get("checkout_url", "")
 
     store.add_order(
