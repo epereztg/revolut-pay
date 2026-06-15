@@ -16,6 +16,7 @@
             </div>
         </div>
 
+        <!-- Generate: Add amount row to generate payment link -->
         <div class="amount-row">
             <label class="field-label" for="amountInput">Amount</label>
             <div class="controls-row">
@@ -26,19 +27,22 @@
                 </div>
                 <button class="btn-primary" id="generateBtn">
                     <span class="material-symbols-outlined btn-icon">link</span>
-                    Generate Link
+                    LinkGenerate
                 </button>
             </div>
             <p class="field-hint">Enter amount in pounds —&nbsp;e.g. <strong>10</strong> for £10.00</p>
         </div>
 
+        <!-- Add status message -->
         <div class="status-message" id="statusMessage" role="status" aria-live="polite"></div>
 
+        <!-- Display: Add link container to display payment link -->
         <div id="linkContainer" style="display: none; padding: 0 36px 36px 36px;">
             <label class="field-label">Share this payment link</label>
             <div class="controls-row" style="margin-top: 8px;">
                 <div class="input-group" style="flex: 1;">
-                    <input type="text" id="paymentLink" class="amount-input" style="font-size: 14px; padding-left: 16px;" readonly />
+                    <input type="text" id="paymentLink" class="amount-input"
+                        style="font-size: 14px; padding-left: 16px;" readonly />
                 </div>
                 <button class="btn-primary" id="copyBtn" style="padding: 0 16px;">
                     Copy
@@ -58,7 +62,7 @@
         const linkContainer = document.getElementById('linkContainer');
         const paymentLink = document.getElementById('paymentLink');
         const copyBtn = document.getElementById('copyBtn');
-        
+
         const amount = parseFloat(amountInput.value);
 
         if (!amount || amount <= 0) {
@@ -86,7 +90,7 @@
             }
 
             const data = await resp.json();
-            
+
             if (window.addOrderToStorage) {
                 window.addOrderToStorage(data.order_id);
             }
@@ -117,7 +121,7 @@
         const paymentLink = document.getElementById('paymentLink');
         paymentLink.select();
         document.execCommand('copy');
-        
+
         const copyBtn = document.getElementById('copyBtn');
         copyBtn.textContent = 'Copied!';
         if (window.showToast) {
