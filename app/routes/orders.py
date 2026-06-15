@@ -1,7 +1,7 @@
 """Orders blueprint — POST /api/orders, GET /api/orders, GET /api/orders/<id>."""
 from flask import Blueprint, jsonify, request, render_template
-from ..services.revolut_service import create_order as revolut_create_order, retrieve_order as revolut_retrieve_order
-from .. import store
+from ..services.revolut_service import create_order as revolut_create_order, retrieve_order as revolut_retrieve_order  # pyrefly: ignore [missing-import]
+from .. import store  # pyrefly: ignore [missing-import]
 
 orders_bp = Blueprint("orders", __name__)
 
@@ -30,12 +30,65 @@ def orders_page():
 def hpp_api_page():
     return render_template("hpp_api.html")
 
-@orders_bp.route("/hpp/link")
+@orders_bp.route("/hpp/link", methods=["GET", "POST"])
 def hpp_link_page():
+    """Render the payment link page. On POST, create an order and return the checkout URL."""
+    if request.method == "POST":
+        error = None
+        checkout_url = None
+        order_id = None
+
+        # Validate amount
+        raw_amount = request.form.get("amount", "").strip()
+        try:
+            amount_float = float(raw_amount)
+            if amount_float <= 0:
+                raise ValueError
+            amount = int(round(amount_float * 100))  # Convert to minor units
+        except (ValueError, TypeError):
+            error = "Please enter a valid amount greater than 0."
+            return render_template("hpp_link.html", error=error, amount=raw_amount)
+
+        currency = "GBP"
+        line_items = [{
+            "name": "Snowboard Jacket Soft Pink",
+            "quantity": 1,
+            "unit_amount": amount,
+        }]
+
+        try:
+            revolut_order = revolut_create_order(amount, currency, line_items=line_items)
+        except Exception as exc:
+            error = f"Revolut API error: {str(exc)}"
+            return render_template("hpp_link.html", error=error, amount=raw_amount)
+
+        order_id = revolut_order["id"]
+        public_token = revolut_order["token"]
+        checkout_url = revolut_order.get("checkout_url", "")
+
+        store.add_order(
+            order_id=order_id,
+            amount=amount,
+            currency=currency,
+            public_token=public_token,
+        )
+
+        if not checkout_url:
+            error = "No checkout URL returned."
+            return render_template("hpp_link.html", error=error, amount=raw_amount)
+
+        return render_template(
+            "hpp_link.html",
+            checkout_url=checkout_url,
+            order_id=order_id,
+            amount=raw_amount,
+        )
+
     return render_template("hpp_link.html")
 
 @orders_bp.route("/checkout/embedded")
 def checkout_embedded_page():
+    # pyrefly: ignore [missing-import]
     from ..config import Config
     return render_template("checkout_embedded.html", public_api_key=Config.PUBLIC_API_KEY)
 

@@ -37,7 +37,7 @@ def create_order(amount: int, currency: str = "GBP", line_items: list = None) ->
     payload = {
         "amount": amount,
         "currency": currency,
-        "redirect_url": "https://hoppg.com"
+        "redirect_url": "https://www.revolut.com/"
     }
     _log_api_call("POST", "/orders", payload)
     response = requests.post(
