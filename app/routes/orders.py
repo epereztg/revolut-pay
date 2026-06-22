@@ -1,6 +1,10 @@
 """Orders blueprint — POST /api/orders, GET /api/orders, GET /api/orders/<id>."""
 from flask import Blueprint, jsonify, request, render_template
-from ..services.revolut_service import create_order as revolut_create_order, retrieve_order as revolut_retrieve_order  # pyrefly: ignore [missing-import]
+from ..services.revolut_service import (  # pyrefly: ignore [missing-import]
+    create_order as revolut_create_order,
+    create_order_with_payload as revolut_create_order_with_payload,
+    retrieve_order as revolut_retrieve_order,
+)
 from .. import store  # pyrefly: ignore [missing-import]
 
 orders_bp = Blueprint("orders", __name__)
@@ -112,17 +116,23 @@ def create_order_endpoint():
 
     currency = data.get("currency", "GBP").upper()
 
-    # Default line item for the demo
-    line_items = [{
-        "name": "Snowboard Jacket Soft Pink",
-        "quantity": 1,
-        "unit_amount": amount
-    }]
-
-    try:
-        revolut_order = revolut_create_order(amount, currency, line_items=line_items)
-    except Exception as exc:
-        return jsonify({"error": f"Revolut API error: {str(exc)}"}), 502
+    # If the payload has fields beyond amount/currency, pass it through directly to Revolut
+    SIMPLE_KEYS = {"amount", "currency"}
+    if set(data.keys()) - SIMPLE_KEYS:
+        try:
+            revolut_order = revolut_create_order_with_payload(data)
+        except Exception as exc:
+            return jsonify({"error": f"Revolut API error: {str(exc)}"}), 502
+    else:
+        line_items = [{
+            "name": "Snowboard Jacket Soft Pink",
+            "quantity": 1,
+            "unit_amount": amount
+        }]
+        try:
+            revolut_order = revolut_create_order(amount, currency, line_items=line_items)
+        except Exception as exc:
+            return jsonify({"error": f"Revolut API error: {str(exc)}"}), 502
 
     order_id = revolut_order["id"]
     public_token = revolut_order["token"]

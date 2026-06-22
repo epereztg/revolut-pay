@@ -3,89 +3,265 @@
 {% block page_title %}Hosted Payment Page API{% endblock %}
 
 {% block content %}
+<style>
+  .json-editor-row {
+    padding: 12px 36px 0 36px;
+  }
+  .json-label-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .json-textarea {
+    width: 100%;
+    min-height: 320px;
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 13px;
+    color: var(--text-primary);
+    resize: vertical;
+    box-sizing: border-box;
+    line-height: 1.6;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .json-textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+  }
+  .btn-copy-sample {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    white-space: nowrap;
+  }
+  .btn-copy-sample:hover {
+    background: var(--accent-glow);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .btn-copy-sample.copied {
+    border-color: #22c55e;
+    color: #22c55e;
+    background: rgba(34, 197, 94, 0.08);
+  }
+  .result-box {
+    padding: 0 36px 24px 36px;
+  }
+  .result-link-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .result-link-input {
+    flex: 1;
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 13px;
+    color: var(--text-primary);
+  }
+  .btn-open-hpp {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 18px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    text-decoration: none;
+    transition: opacity 0.15s, transform 0.1s;
+  }
+  .btn-open-hpp:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+  }
+</style>
+
 <div class="checkout-container">
-    <div class="checkout-card">
-        <div class="product-visual">
-            <img src="{{ url_for('static', filename='img/product_jacket.png') }}" alt="Snowboard Jacket Soft Pink"
-                class="product-hero-img">
-        </div>
-        <div class="checkout-header">
-            <div>
-                <h1 class="checkout-title">Snowboard Jacket Soft Pink</h1>
-                <p class="checkout-subtitle">Enter an amount and checkout via HPP</p>
-            </div>
-        </div>
-
-        <div class="amount-row">
-            <label class="field-label" for="amountInput">Amount</label>
-            <div class="controls-row">
-                <div class="input-group">
-                    <span class="currency-prefix">£</span>
-                    <input type="number" id="amountInput" class="amount-input" placeholder="10.00" min="0.01"
-                        step="0.01" aria-label="Payment amount in GBP" />
-                </div>
-                <button class="btn-primary" id="generateBtn">
-                    <span class="material-symbols-outlined btn-icon">open_in_new</span>
-                    Checkout with HPP
-                </button>
-            </div>
-            <p class="field-hint">Enter amount in pounds —&nbsp;e.g. <strong>10</strong> for £10.00</p>
-        </div>
-
-        <div class="status-message" id="statusMessage" role="status" aria-live="polite"></div>
+  <div class="checkout-card">
+    <div class="product-visual">
+      <img src="{{ url_for('static', filename='img/product_jacket.png') }}" alt="Snowboard Jacket Soft Pink"
+        class="product-hero-img">
     </div>
+    <div class="checkout-header">
+      <div>
+        <h1 class="checkout-title">Snowboard Jacket Soft Pink</h1>
+        <p class="checkout-subtitle">Edit the request body and generate a Hosted Payment Page link</p>
+      </div>
+    </div>
+
+    <!-- JSON request body editor -->
+    <div class="json-editor-row">
+      <div class="json-label-row">
+        <label class="field-label" for="jsonBody" style="margin-bottom:0;">Request body</label>
+        <button type="button" class="btn-copy-sample" id="copyBtn">
+          <span class="material-symbols-outlined" style="font-size:14px;">content_copy</span>
+          Copy
+        </button>
+      </div>
+      <textarea id="jsonBody" class="json-textarea" spellcheck="false">{
+    "amount": 24325,
+    "currency": "EUR",
+    "expire_pending_after": "PT15M",
+    "authorisation_type": "pre_authorisation",
+    "capture_mode": "manual",
+    "description": "ORDER516586",
+    "redirect_url": "https://www.alphamega.com.cy/",
+    "allowed_payment_methods": [
+        "CARD",
+        "APPLE_PAY",
+        "GOOGLE_PAY"
+    ],
+    "customer": {
+        "email": "test@test.com",
+        "date_of_birth": "1992-02-20"
+    },
+    "line_items": [
+        {
+            "name": "Disney Princess Paint",
+            "type": "physical",
+            "quantity": {
+                "value": 2,
+                "unit": "pcs"
+            },
+            "unit_price_amount": 299,
+            "total_amount": 598,
+            "external_id": "612640"
+        }
+    ]
+}</textarea>
+    </div>
+
+    <!-- Generate button -->
+    <div class="amount-row" style="padding-top: 16px;">
+      <div class="controls-row" style="justify-content: flex-start;">
+        <button class="btn-primary" id="generateBtn">
+          <span class="material-symbols-outlined btn-icon">open_in_new</span>
+          Generate Payment Link
+        </button>
+      </div>
+    </div>
+
+    <div class="status-message" id="statusMessage" role="status" aria-live="polite"></div>
+
+    <!-- Result section -->
+    <div id="resultBox" class="result-box" style="display:none;">
+      <label class="field-label">Checkout URL</label>
+      <div class="result-link-row">
+        <input type="text" id="resultUrl" class="result-link-input" readonly />
+        <a id="openHppBtn" href="#" target="_blank" class="btn-open-hpp">
+          <span class="material-symbols-outlined" style="font-size:16px;">open_in_new</span>
+          Open HPP
+        </a>
+      </div>
+      <p class="field-hint" id="orderIdHint" style="margin-top:8px;"></p>
+    </div>
+  </div>
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script>
-    document.getElementById('generateBtn').addEventListener('click', async () => {
-        const btn = document.getElementById('generateBtn');
-        const amountInput = document.getElementById('amountInput');
-        const statusMsg = document.getElementById('statusMessage');
-        const amount = parseFloat(amountInput.value);
+  const SAMPLE_JSON = document.getElementById('jsonBody').value;
 
-        if (!amount || amount <= 0) {
-            statusMsg.textContent = 'Please enter a valid amount greater than 0.';
-            statusMsg.className = 'status-message error';
-            return;
-        }
-
-        btn.disabled = true;
-        statusMsg.textContent = 'Redirecting to Hosted Payment Page...';
-        statusMsg.className = 'status-message';
-
-        try {
-            const resp = await fetch('/api/orders', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ amount: Math.round(amount * 100), currency: 'GBP' }),
-            });
-
-            if (!resp.ok) {
-                const err = await resp.json().catch(() => ({}));
-                throw new Error(err.error || `HTTP ${resp.status}`);
-            }
-
-            const data = await resp.json();
-            
-            if (window.addOrderToStorage) {
-                window.addOrderToStorage(data.order_id);
-            }
-
-            if (data.checkout_url) {
-                window.location.href = data.checkout_url;
-            } else {
-                throw new Error('No checkout URL returned.');
-            }
-        } catch (err) {
-            statusMsg.textContent = `Error: ${err.message}`;
-            statusMsg.className = 'status-message error';
-            if (window.showToast) {
-                window.showToast('error', 'Checkout failed', err.message);
-            }
-            btn.disabled = false;
-        }
+  // Copy button: copies textarea content to clipboard
+  document.getElementById('copyBtn').addEventListener('click', () => {
+    const btn = document.getElementById('copyBtn');
+    const text = document.getElementById('jsonBody').value;
+    navigator.clipboard.writeText(text).then(() => {
+      btn.classList.add('copied');
+      btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:14px;">check</span> Copied!';
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:14px;">content_copy</span> Copy';
+      }, 2000);
     });
+  });
+
+  // Generate button: POST the JSON body to /api/orders
+  document.getElementById('generateBtn').addEventListener('click', async () => {
+    const btn = document.getElementById('generateBtn');
+    const statusMsg = document.getElementById('statusMessage');
+    const resultBox = document.getElementById('resultBox');
+    const rawJson = document.getElementById('jsonBody').value.trim();
+
+    // Validate JSON
+    let payload;
+    try {
+      payload = JSON.parse(rawJson);
+    } catch (e) {
+      statusMsg.textContent = 'Invalid JSON — please fix the syntax and try again.';
+      statusMsg.className = 'status-message error';
+      resultBox.style.display = 'none';
+      return;
+    }
+
+    btn.disabled = true;
+    statusMsg.textContent = 'Creating order…';
+    statusMsg.className = 'status-message';
+    resultBox.style.display = 'none';
+
+    try {
+      const resp = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await resp.json();
+
+      if (!resp.ok) {
+        throw new Error(data.error || `HTTP ${resp.status}`);
+      }
+
+      if (window.addOrderToStorage) {
+        window.addOrderToStorage(data.order_id);
+      }
+
+      if (!data.checkout_url) {
+        throw new Error('No checkout URL returned.');
+      }
+
+      // Show result
+      statusMsg.textContent = 'Payment link generated successfully!';
+      statusMsg.className = 'status-message success';
+
+      document.getElementById('resultUrl').value = data.checkout_url;
+      document.getElementById('openHppBtn').href = data.checkout_url;
+      document.getElementById('orderIdHint').textContent = `Order ID: ${data.order_id}`;
+      resultBox.style.display = 'block';
+
+    } catch (err) {
+      statusMsg.textContent = `Error: ${err.message}`;
+      statusMsg.className = 'status-message error';
+      if (window.showToast) {
+        window.showToast('error', 'Order creation failed', err.message);
+      }
+    } finally {
+      btn.disabled = false;
+    }
+  });
 </script>
 {% endblock %}

@@ -39,19 +39,22 @@ function updateStatusBadge(el, status) {
 /**
  * Step 1 — POST /api/orders with amount in minor units (cents).
  */
-async function createOrderOnBackend(amount) {
+async function createOrderOnBackend(payload) {
+    console.log('[createOrderOnBackend] POST /api/orders', payload);
     const resp = await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount: Math.round(amount * 100), currency: 'GBP' }),
+        body: JSON.stringify(payload),
     });
 
+    const data = await resp.json().catch(() => ({}));
+    console.log(`[createOrderOnBackend] ${resp.status}`, data);
+
     if (!resp.ok) {
-        const err = await resp.json().catch(() => ({}));
-        throw new Error(err.error || `HTTP ${resp.status}`);
+        throw new Error(data.error || `HTTP ${resp.status}`);
     }
 
-    return resp.json(); // { order_id, public_token, amount, currency }
+    return data; // { order_id, public_token, amount, currency }
 }
 
 /**
@@ -187,7 +190,7 @@ generateBtn.addEventListener('click', async () => {
     setStatus('Creating order…');
 
     try {
-        const order = await createOrderOnBackend(amount);
+        const order = await createOrderOnBackend({ amount: Math.round(amount * 100), currency: 'GBP' });
 
         // Persist to localStorage so dashboard can fetch it
         addOrderToStorage(order.order_id);

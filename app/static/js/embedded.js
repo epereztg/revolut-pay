@@ -43,19 +43,22 @@ function updateStatusBadge(el, status) {
  * Amount input is in pounds; we multiply by 100.
  * The backend /api/orders route uses revolut_service.create_order internally.
  */
-async function createOrderOnBackend(amount) {
+async function createOrderOnBackend(payload) {
+    console.log('[createOrderOnBackend] POST /api/orders', payload);
     const resp = await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount: Math.round(amount * 100), currency: 'GBP' }),
+        body: JSON.stringify(payload),
     });
 
+    const data = await resp.json().catch(() => ({}));
+    console.log(`[createOrderOnBackend] ${resp.status}`, data);
+
     if (!resp.ok) {
-        const err = await resp.json().catch(() => ({}));
-        throw new Error(err.error || `HTTP ${resp.status}`);
+        throw new Error(data.error || `HTTP ${resp.status}`);
     }
 
-    return resp.json(); // { order_id, public_token, amount, currency, checkout_url }
+    return data; // { order_id, public_token, amount, currency, checkout_url }
 }
 
 /**
@@ -111,7 +114,7 @@ generateBtn.addEventListener('click', async () => {
             // The widget calls this function when it needs an order to process the payment.
             // It calls our createOrderOnBackend helper to trigger the backend API.
             createOrder: async () => {
-                const order = await createOrderOnBackend(amount);
+                const order = await createOrderOnBackend({ amount: Math.round(amount * 100), currency: 'GBP' });
 
                 // Persist to localStorage so dashboard can fetch it
                 if (window.addOrderToStorage) {

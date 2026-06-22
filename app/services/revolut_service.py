@@ -25,6 +25,21 @@ def _log_api_call(method: str, endpoint: str, payload: dict = None, response: di
     print("-------------------------------------------\n")
 
 
+def create_order_with_payload(payload: dict) -> dict:
+    """Create an order in Revolut sandbox using a full custom payload."""
+    _log_api_call("POST", "/orders", payload)
+    response = requests.post(
+        f"{SANDBOX_BASE}/orders",
+        json=payload,
+        headers=_auth_headers(),
+        timeout=10,
+    )
+    res_json = response.json()
+    _log_api_call("POST", "/orders", payload, res_json)
+    response.raise_for_status()
+    return res_json
+
+
 def create_order(amount: int, currency: str = "GBP", line_items: list = None) -> dict:
     """
     Create an order in Revolut sandbox.
