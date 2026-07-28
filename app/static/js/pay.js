@@ -66,8 +66,7 @@ function loadRevolutSDK() {
     return new Promise((resolve, reject) => {
         if (window.RevolutCheckout) return resolve(window.RevolutCheckout);
         const script = document.createElement('script');
-        // Sandbox widget endpoint
-        script.src = 'https://sandbox-merchant.revolut.com/embed.js';
+        script.src = window.getRevolutSdkUrl();
         script.dataset.revolut = 'checkout';
         script.onload = () => resolve(window.RevolutCheckout);
         script.onerror = () => reject(new Error('Failed to load Revolut SDK'));
@@ -88,7 +87,7 @@ async function initWidget(order) {
     const { revolutPay } = await RevolutCheckout.payments({
         locale: 'en',
         publicToken: publicToken,
-        mode: 'sandbox',
+        mode: window.getRevolutMode(),
     });
 
     let processingTimeoutId = null;

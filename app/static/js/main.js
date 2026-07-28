@@ -85,7 +85,24 @@ function addOrderToStorage(id) {
     }
 }
 
+// ─── Revolut environment (sandbox/production) helpers ──────────────────────────
+/**
+ * window.REVOLUT_MODE is set server-side in base.html from the sidebar toggle.
+ * @returns {'sandbox'|'prod'}
+ */
+function getRevolutMode() {
+    return window.REVOLUT_MODE === 'prod' ? 'prod' : 'sandbox';
+}
+
+function getRevolutSdkUrl() {
+    return getRevolutMode() === 'prod'
+        ? 'https://merchant.revolut.com/embed.js'
+        : 'https://sandbox-merchant.revolut.com/embed.js';
+}
+
 // Expose to other scripts
 window.showToast = showToast;
 window.getStoredOrderIds = getStoredOrderIds;
 window.addOrderToStorage = addOrderToStorage;
+window.getRevolutMode = getRevolutMode;
+window.getRevolutSdkUrl = getRevolutSdkUrl;

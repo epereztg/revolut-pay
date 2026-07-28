@@ -68,8 +68,7 @@ function loadRevolutSDK() {
     return new Promise((resolve, reject) => {
         if (window.RevolutCheckout) return resolve(window.RevolutCheckout);
         const script = document.createElement('script');
-        // Sandbox widget endpoint
-        script.src = 'https://sandbox-merchant.revolut.com/embed.js';
+        script.src = window.getRevolutSdkUrl();
         script.onload = () => resolve(window.RevolutCheckout);
         script.onerror = () => reject(new Error('Failed to load Revolut SDK'));
         document.head.appendChild(script);
@@ -104,7 +103,7 @@ generateBtn.addEventListener('click', async () => {
         const { destroy } = await RevolutCheckout.embeddedCheckout({
             target: widgetMount,
             publicToken: window.REVOLUT_PUBLIC_API_KEY,
-            mode: 'sandbox', // 'prod' for production, 'sandbox' for testing
+            mode: window.getRevolutMode(),
             locale: 'en',
             paymentOptions: {
                 currency: 'GBP',

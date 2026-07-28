@@ -5,8 +5,11 @@ import os
 class Config:
     PUBLIC_API_KEY: str = os.environ.get("PUBLIC_API_KEY", "")
     PRIVATE_SECRET_KEY: str = os.environ.get("PRIVATE_SECRET_KEY", "")
+    PROD_PUBLIC_API_KEY: str = os.environ.get("PROD_PUBLIC_API_KEY", "")
+    PROD_PRIVATE_SECRET_KEY: str = os.environ.get("PROD_PRIVATE_SECRET_KEY", "")
     FLASK_SECRET_KEY: str = os.environ.get("FLASK_SECRET_KEY", "dev-secret-key")
     REVOLUT_SANDBOX_BASE_URL: str = "https://sandbox-merchant.revolut.com/api/"
+    REVOLUT_PROD_BASE_URL: str = "https://merchant.revolut.com/api/"
 
     @classmethod
     def validate(cls):

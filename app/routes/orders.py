@@ -1,11 +1,12 @@
 """Orders blueprint — POST /api/orders, GET /api/orders, GET /api/orders/<id>."""
-from flask import Blueprint, jsonify, request, render_template
+from flask import Blueprint, jsonify, request, render_template, redirect
 from ..services.revolut_service import (  # pyrefly: ignore [missing-import]
     create_order as revolut_create_order,
     create_order_with_payload as revolut_create_order_with_payload,
     retrieve_order as revolut_retrieve_order,
 )
 from .. import store  # pyrefly: ignore [missing-import]
+from .. import environment
 
 orders_bp = Blueprint("orders", __name__)
 
@@ -17,8 +18,19 @@ def index():
 
 @orders_bp.route("/pay")
 def pay_page():
-    from ..config import Config
-    return render_template("pay.html", public_api_key=Config.PUBLIC_API_KEY)
+    return render_template("pay.html", public_api_key=environment.get_public_key())
+
+
+@orders_bp.route("/environment/toggle", methods=["POST"])
+def toggle_environment():
+    """Flips the sandbox/production toggle used by the sidebar badge."""
+    target = "prod" if environment.get_mode() == "sandbox" else "sandbox"
+    try:
+        environment.set_mode(target)
+    except ValueError:
+        # Missing keys for the target environment — leave the mode unchanged.
+        pass
+    return redirect(request.referrer or "/dashboard")
 
 
 @orders_bp.route("/dashboard")
@@ -90,11 +102,19 @@ def hpp_link_page():
 
     return render_template("hpp_link.html")
 
+@orders_bp.route("/pay/fast-checkout")
+def fast_checkout_page():
+    return render_template("fast_checkout.html", public_api_key=environment.get_public_key())
+
+
+@orders_bp.route("/subscriptions")
+def subscriptions_page():
+    return render_template("subscriptions.html", public_api_key=environment.get_public_key())
+
+
 @orders_bp.route("/checkout/embedded")
 def checkout_embedded_page():
-    # pyrefly: ignore [missing-import]
-    from ..config import Config
-    return render_template("checkout_embedded.html", public_api_key=Config.PUBLIC_API_KEY)
+    return render_template("checkout_embedded.html", public_api_key=environment.get_public_key())
 
 
 @orders_bp.route("/api/orders", methods=["POST"])

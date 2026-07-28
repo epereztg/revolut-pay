@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Subscriptions — Save Payment Method{% endblock %}
+{% block page_title %}Save Payment Method{% endblock %}
+
+{% block content %}
+<div class="checkout-container">
+    <div class="checkout-card">
+        <div class="product-visual">
+            <img src="{{ url_for('static', filename='img/product_jacket.png') }}" alt="Snowboard Jacket Soft Pink"
+                class="product-hero-img">
+        </div>
+        <div class="checkout-header">
+            <div>
+                <h1 class="checkout-title">Snowboard Jacket Soft Pink</h1>
+                <p class="checkout-subtitle">Complete checkout to save your payment method for future purchases</p>
+            </div>
+        </div>
+
+        <div class="amount-row" style="padding-bottom: 12px;">
+            <label class="field-label" for="amountInput">Amount</label>
+            <div class="controls-row">
+                <div class="input-group">
+                    <span class="currency-prefix">£</span>
+                    <input type="number" id="amountInput" class="amount-input" placeholder="10.00" min="0.01"
+                        step="0.01" value="10.00" aria-label="Payment amount in GBP" />
+                </div>
+            </div>
+            <p class="field-hint">Enter amount in pounds — e.g. <strong>10</strong> for £10.00</p>
+        </div>
+
+        <div class="amount-row" style="padding-top: 0; padding-bottom: 12px;">
+            <label class="field-label" for="customerEmail">Customer email</label>
+            <div class="input-group">
+                <input type="email" id="customerEmail" class="amount-input" style="padding-left: 16px;"
+                    placeholder="customer@example.com" value="test@test.com" />
+            </div>
+        </div>
+
+        <div class="amount-row" style="padding-top: 0; padding-bottom: 24px;">
+            <label class="field-label" for="customerName">Customer full name</label>
+            <div class="controls-row">
+                <div class="input-group">
+                    <input type="text" id="customerName" class="amount-input" style="padding-left: 16px;"
+                        placeholder="Jane Doe" value="Test User" />
+                </div>
+                <button class="btn-primary" id="generateBtn">
+                    <span class="material-symbols-outlined btn-icon">autorenew</span>
+                    Load Checkout
+                </button>
+            </div>
+        </div>
+
+        <div class="status-message" id="statusMessage" role="status" aria-live="polite"></div>
+
+        <!-- Revolut Pay widget mounts here -->
+        <div id="revolut-pay" class="widget-container"></div>
+    </div>
+
+    <div class="order-info-card" id="orderInfoCard" style="display:none">
+        <h2 class="section-heading">Order Details</h2>
+        <div class="detail-row"><span>Order ID</span><code id="detailOrderId">—</code></div>
+        <div class="detail-row"><span>Amount</span><span id="detailAmount">—</span></div>
+        <div class="detail-row"><span>Currency</span><span id="detailCurrency">—</span></div>
+        <div class="detail-row"><span>Customer</span><span id="detailCustomer">—</span></div>
+        <div class="detail-row"><span>Save method for</span><span class="status-badge">MERCHANT</span></div>
+        <div class="detail-row"><span>Status</span><span class="status-badge" id="detailStatus">PENDING</span></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    window.REVOLUT_PUBLIC_API_KEY = "{{ public_api_key }}";
+</script>
+<script src="{{ url_for('static', filename='js/subscriptions.js') }}"></script>
+{% endblock %}

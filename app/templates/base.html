@@ -33,6 +33,10 @@
         <span class="material-symbols-outlined nav-icon">payments</span>
         <span class="nav-text">Revolut Pay</span>
       </a>
+      <a href="/pay/fast-checkout" class="nav-item {% if request.path == '/pay/fast-checkout' %}active{% endif %}">
+        <span class="material-symbols-outlined nav-icon">bolt</span>
+        <span class="nav-text">Fast Checkout</span>
+      </a>
       <a href="/orders" class="nav-item {% if request.path == '/orders' %}active{% endif %}">
         <span class="material-symbols-outlined nav-icon">receipt_long</span>
         <span class="nav-text">Orders</span>
@@ -48,6 +52,12 @@
         <span class="nav-text">API Integration</span>
       </a>
 
+      <div class="nav-section-title">Subscriptions</div>
+      <a href="/subscriptions" class="nav-item {% if request.path == '/subscriptions' %}active{% endif %}">
+        <span class="material-symbols-outlined nav-icon">autorenew</span>
+        <span class="nav-text">Save Payment Method</span>
+      </a>
+
       <div class="nav-section-title">Revolut Checkout</div>
       <a href="/checkout/embedded" class="nav-item {% if request.path == '/checkout/embedded' %}active{% endif %}">
         <span class="material-symbols-outlined nav-icon">web_asset</span>
@@ -55,7 +65,12 @@
       </a>
     </nav>
     <div class="sidebar-footer">
-      <div class="sidebar-badge">Sandbox Mode</div>
+      <form action="/environment/toggle" method="POST">
+        <button type="submit" class="sidebar-badge sidebar-badge-toggle {{ 'prod' if environment_mode == 'prod' else 'sandbox' }}"
+          title="Click to switch to {{ 'Sandbox' if environment_mode == 'prod' else 'Production' }} mode">
+          {{ 'Production Mode' if environment_mode == 'prod' else 'Sandbox Mode' }}
+        </button>
+      </form>
     </div>
   </aside>
 
@@ -82,7 +97,7 @@
         <button class="panel-close" id="panelClose" aria-label="Close panel">&times;</button>
       </div>
       <div class="user-panel-body">
-        <div class="info-row"><span>Environment</span><span class="badge-sandbox">Sandbox</span></div>
+        <div class="info-row"><span>Environment</span><span class="badge-sandbox">{{ 'Production' if environment_mode == 'prod' else 'Sandbox' }}</span></div>
         <div class="info-row"><span>Version</span><span>1.0.0</span></div>
         <div class="info-row"><span>API Version</span><span>2026-04-20</span></div>
       </div>
@@ -97,6 +112,9 @@
   <!-- Toast container -->
   <div class="toast-container" id="toastContainer"></div>
 
+  <script>
+    window.REVOLUT_MODE = "{{ environment_mode }}";
+  </script>
   <script src="{{ url_for('static', filename='js/main.js') }}"></script>
   {% block scripts %}{% endblock %}
 </body>

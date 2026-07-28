@@ -178,6 +178,32 @@ a:hover {
   border-radius: 20px;
 }
 
+.sidebar-badge-toggle {
+  font-family: inherit;
+  cursor: pointer;
+  transition: opacity var(--transition), transform var(--transition);
+}
+
+.sidebar-badge-toggle:hover {
+  opacity: 0.85;
+}
+
+.sidebar-badge-toggle:active {
+  transform: translateY(1px);
+}
+
+.sidebar-badge-toggle.sandbox {
+  background: #fef3c7;
+  color: #d97706;
+  border-color: #fde68a;
+}
+
+.sidebar-badge-toggle.prod {
+  background: #fee2e2;
+  color: #dc2626;
+  border-color: #fecaca;
+}
+
 /* ─────────────────────────────────────────────
    Topbar
 ───────────────────────────────────────────── */

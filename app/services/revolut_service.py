@@ -1,15 +1,16 @@
 """Service layer for Revolut Merchant API calls."""
 import requests
-from ..config import Config
+from .. import environment
 
 
-SANDBOX_BASE = Config.REVOLUT_SANDBOX_BASE_URL
-
+def _base_url() -> str:
+    """Resolves to the sandbox or production Merchant API host based on the current toggle."""
+    return environment.get_base_url()
 
 
 def _auth_headers() -> dict:
     return {
-        "Authorization": f"Bearer {Config.PRIVATE_SECRET_KEY}",
+        "Authorization": f"Bearer {environment.get_secret_key()}",
         "Content-Type": "application/json",
         "Accept": "application/json",
         "Revolut-Api-Version": "2026-04-20"
@@ -29,7 +30,7 @@ def create_order_with_payload(payload: dict) -> dict:
     """Create an order in Revolut sandbox using a full custom payload."""
     _log_api_call("POST", "/orders", payload)
     response = requests.post(
-        f"{SANDBOX_BASE}/orders",
+        f"{_base_url()}/orders",
         json=payload,
         headers=_auth_headers(),
         timeout=10,
@@ -56,7 +57,7 @@ def create_order(amount: int, currency: str = "GBP", line_items: list = None) ->
     }
     _log_api_call("POST", "/orders", payload)
     response = requests.post(
-        f"{SANDBOX_BASE}/orders",
+        f"{_base_url()}/orders",
         json=payload,
         headers=_auth_headers(),
         timeout=10,
@@ -72,7 +73,7 @@ def create_order(amount: int, currency: str = "GBP", line_items: list = None) ->
 def retrieve_order(order_id: str) -> dict:
     """Retrieve order details from Revolut to sync status."""
     response = requests.get(
-        f"{SANDBOX_BASE}/orders/{order_id}",
+        f"{_base_url()}/orders/{order_id}",
         headers=_auth_headers(),
         timeout=10,
     )
@@ -87,7 +88,7 @@ def retrieve_order(order_id: str) -> dict:
 def cancel_order(order_id: str) -> dict:
     """Cancel an existing order in Revolut."""
     response = requests.post(
-        f"{SANDBOX_BASE}/orders/{order_id}/cancel",
+        f"{_base_url()}/orders/{order_id}/cancel",
         headers=_auth_headers(),
         timeout=10,
     )

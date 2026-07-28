@@ -1,6 +1,7 @@
 """Flask application factory."""
 from flask import Flask
 from .config import Config
+from . import environment
 from .routes.orders import orders_bp
 from .routes.webhooks import webhooks_bp
 
@@ -13,6 +14,10 @@ def create_app() -> Flask:
     # Register blueprints
     app.register_blueprint(orders_bp)
     app.register_blueprint(webhooks_bp)
+
+    @app.context_processor
+    def inject_environment_mode():
+        return {"environment_mode": environment.get_mode()}
 
     @app.errorhandler(404)
     def resource_not_found(e):
