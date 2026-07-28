@@ -215,3 +215,43 @@ def cancel_order_endpoint(order_id: str):
         return jsonify({"status": "cancelled"}), 200
     except Exception as exc:
         return jsonify({"error": f"Failed to cancel: {str(exc)}"}), 502
+
+
+@orders_bp.route("/api/fast-checkout/webhook", methods=["POST"])
+def register_fast_checkout_webhook():
+    """Registers this app's address-validation endpoint with Revolut for the
+    current environment. `base_url` must be a public HTTPS URL (e.g. an
+    ngrok tunnel) since Revolut calls it server-to-server."""
+    data = request.get_json(silent=True) or {}
+    base_url = (data.get("base_url") or "").strip().rstrip("/")
+
+    if not base_url.startswith("https://"):
+        return jsonify({"error": "base_url must be a public HTTPS URL (e.g. an ngrok tunnel)"}), 400
+
+    mode = environment.get_mode()
+    webhook_url = f"{base_url}/webhooks/revolut/fast-checkout-address/{mode}"
+
+    try:
+        from ..services.revolut_service import register_address_validation_webhook
+        result = register_address_validation_webhook(webhook_url)
+    except Exception as exc:
+        return jsonify({"error": f"Revolut API error: {str(exc)}"}), 502
+
+    environment.set_fast_checkout_webhook(mode, {
+        "id": result["id"],
+        "url": result["url"],
+        "signing_key": result["signing_key"],
+    })
+
+    return jsonify({"mode": mode, "url": result["url"], "id": result["id"]}), 200
+
+
+@orders_bp.route("/api/fast-checkout/webhook", methods=["GET"])
+def get_fast_checkout_webhook_status():
+    mode = environment.get_mode()
+    webhook = environment.get_fast_checkout_webhook(mode)
+    return jsonify({
+        "mode": mode,
+        "registered": bool(webhook),
+        "url": webhook.get("url"),
+    }), 200

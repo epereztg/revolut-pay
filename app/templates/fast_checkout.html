@@ -4,6 +4,24 @@
 
 {% block content %}
 <div class="checkout-container">
+    <div class="order-info-card" id="webhookSetupCard">
+        <h2 class="section-heading">Address validation webhook</h2>
+        <p class="field-hint" style="margin: -6px 0 12px;">Revolut Pay calls this server-to-server to check you
+            deliver to the shopper's address. It needs a public HTTPS URL — for local testing, point an ngrok
+            tunnel at this app and paste its URL below.</p>
+        <div class="controls-row">
+            <div class="input-group">
+                <input type="text" id="webhookBaseUrlInput" class="amount-input" style="padding-left: 16px;"
+                    placeholder="https://xxxx.ngrok-free.app" />
+            </div>
+            <button class="btn-primary" id="registerWebhookBtn">
+                <span class="material-symbols-outlined btn-icon">link</span>
+                Register
+            </button>
+        </div>
+        <p class="status-message" id="webhookStatus" role="status" aria-live="polite" style="text-align:left; padding:0; margin-top:8px;"></p>
+    </div>
+
     <div class="checkout-card">
         <div class="product-visual">
             <img src="{{ url_for('static', filename='img/product_jacket.png') }}" alt="Snowboard Jacket Soft Pink"

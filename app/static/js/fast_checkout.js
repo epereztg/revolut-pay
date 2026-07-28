@@ -12,8 +12,11 @@
  * In production this also requires registering a server-side address
  * validation webhook (POST /synchronous-webhooks, event_type
  * "fast_checkout.validate_address") so Revolut can confirm you deliver to
- * the selected address before it's offered to the shopper — see
- * https://developer.revolut.com/docs/merchant/register-address-validation-endpoint.
+ * the selected address before it's offered to the shopper. The "Register"
+ * form on this page calls POST /api/fast-checkout/webhook to do that; the
+ * receiving endpoint lives at
+ * /webhooks/revolut/fast-checkout-address/<sandbox|prod> in webhooks.py —
+ * see that file's docstring for caveats on the unverified payload schema.
  *
  * There's no real Revolut app/account in sandbox to source a shipping
  * address from (confirmed: the sandbox order API silently accepts a
@@ -44,6 +47,53 @@ const detailStatus   = document.getElementById('detailStatus');
 
 const detailShippingAddress = document.getElementById('detailShippingAddress');
 const detailShippingOption  = document.getElementById('detailShippingOption');
+
+const webhookBaseUrlInput = document.getElementById('webhookBaseUrlInput');
+const registerWebhookBtn  = document.getElementById('registerWebhookBtn');
+const webhookStatus       = document.getElementById('webhookStatus');
+
+async function refreshWebhookStatus() {
+    try {
+        const resp = await fetch('/api/fast-checkout/webhook');
+        const data = await resp.json();
+        webhookStatus.textContent = data.registered
+            ? `Registered for ${data.mode}: ${data.url}`
+            : `Not registered for ${data.mode} yet.`;
+    } catch (err) {
+        console.warn('[fast_checkout] Could not load webhook status', err);
+    }
+}
+
+registerWebhookBtn?.addEventListener('click', async () => {
+    const baseUrl = webhookBaseUrlInput.value.trim();
+    if (!baseUrl) {
+        webhookStatus.textContent = 'Enter a public HTTPS base URL first.';
+        return;
+    }
+
+    registerWebhookBtn.disabled = true;
+    webhookStatus.textContent = 'Registering…';
+
+    try {
+        const resp = await fetch('/api/fast-checkout/webhook', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ base_url: baseUrl }),
+        });
+        const data = await resp.json().catch(() => ({}));
+        if (!resp.ok) throw new Error(data.error || `HTTP ${resp.status}`);
+
+        webhookStatus.textContent = `Registered for ${data.mode}: ${data.url}`;
+        if (window.showToast) showToast('success', 'Webhook registered', data.url);
+    } catch (err) {
+        webhookStatus.textContent = `Error: ${err.message}`;
+        if (window.showToast) showToast('error', 'Registration failed', err.message);
+    } finally {
+        registerWebhookBtn.disabled = false;
+    }
+});
+
+refreshWebhookStatus();
 
 function setStatus(msg, type = 'info') {
     statusMsg.textContent = msg;

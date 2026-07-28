@@ -3,7 +3,12 @@ import threading
 from .config import Config
 
 _lock = threading.Lock()
-_state = {"mode": "sandbox"}
+_state = {
+    "mode": "sandbox",
+    # Fast checkout address-validation webhook registered per environment:
+    # {"sandbox": {"id", "url", "signing_key"}, "prod": {...}}
+    "fast_checkout_webhooks": {"sandbox": {}, "prod": {}},
+}
 
 
 def get_mode() -> str:
@@ -41,3 +46,14 @@ def get_secret_key() -> str:
 
 def get_base_url() -> str:
     return Config.REVOLUT_PROD_BASE_URL if get_mode() == "prod" else Config.REVOLUT_SANDBOX_BASE_URL
+
+
+def get_fast_checkout_webhook(mode: str = None) -> dict:
+    mode = mode or get_mode()
+    with _lock:
+        return dict(_state["fast_checkout_webhooks"].get(mode, {}))
+
+
+def set_fast_checkout_webhook(mode: str, webhook: dict) -> None:
+    with _lock:
+        _state["fast_checkout_webhooks"][mode] = webhook

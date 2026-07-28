@@ -30,7 +30,7 @@ def create_order_with_payload(payload: dict) -> dict:
     """Create an order in Revolut sandbox using a full custom payload."""
     _log_api_call("POST", "/orders", payload)
     response = requests.post(
-        f"{_base_url()}/orders",
+        f"{_base_url()}orders",
         json=payload,
         headers=_auth_headers(),
         timeout=10,
@@ -57,7 +57,7 @@ def create_order(amount: int, currency: str = "GBP", line_items: list = None) ->
     }
     _log_api_call("POST", "/orders", payload)
     response = requests.post(
-        f"{_base_url()}/orders",
+        f"{_base_url()}orders",
         json=payload,
         headers=_auth_headers(),
         timeout=10,
@@ -73,7 +73,7 @@ def create_order(amount: int, currency: str = "GBP", line_items: list = None) ->
 def retrieve_order(order_id: str) -> dict:
     """Retrieve order details from Revolut to sync status."""
     response = requests.get(
-        f"{_base_url()}/orders/{order_id}",
+        f"{_base_url()}orders/{order_id}",
         headers=_auth_headers(),
         timeout=10,
     )
@@ -88,7 +88,7 @@ def retrieve_order(order_id: str) -> dict:
 def cancel_order(order_id: str) -> dict:
     """Cancel an existing order in Revolut."""
     response = requests.post(
-        f"{_base_url()}/orders/{order_id}/cancel",
+        f"{_base_url()}orders/{order_id}/cancel",
         headers=_auth_headers(),
         timeout=10,
     )
@@ -100,6 +100,30 @@ def cancel_order(order_id: str) -> dict:
         res_json = {"status": "success"}
         
     _log_api_call("POST", f"/orders/{order_id}/cancel", response=res_json)
-    
+
+    response.raise_for_status()
+    return res_json
+
+
+def register_address_validation_webhook(url: str) -> dict:
+    """
+    Registers (or replaces — Revolut overrides any previous registration for
+    this event_type) the Fast checkout shipping-address validation webhook
+    for the current environment. Revolut Pay calls `url` synchronously while
+    the shopper is picking a shipping address.
+
+    Verified against the live sandbox API: returns
+    {"id", "url", "event_type", "signing_key"}.
+    """
+    payload = {"event_type": "fast_checkout.validate_address", "url": url}
+    _log_api_call("POST", "/synchronous-webhooks", payload)
+    response = requests.post(
+        f"{_base_url()}synchronous-webhooks",
+        json=payload,
+        headers=_auth_headers(),
+        timeout=10,
+    )
+    res_json = response.json()
+    _log_api_call("POST", "/synchronous-webhooks", payload, res_json)
     response.raise_for_status()
     return res_json

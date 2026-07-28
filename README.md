@@ -72,7 +72,7 @@ pip install -r requirements.txt
 # Start the server
 python3 run.py
 ```
-Visit `http://localhost:5000/pay` to start a test transaction.
+Visit `http://localhost:5001/pay` to start a test transaction.
 
 ---
 
